@@ -1,1 +1,1 @@
-HackMD https://hackmd.io/z8rWYT-yQLubj_x1U9SfTg?both&fbclid=IwAR33KM1hWbwiZDFsYd3TjaZSf8OSeYWxpkeDFyoUqOlqbenYZYrsrMBtm2g
+HackMD https://hackmd.io/z8rWYT-yQLubj_x1U9SfTg
