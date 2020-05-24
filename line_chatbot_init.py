@@ -5,13 +5,13 @@ from flask import Flask, request, abort
 from linebot import LineBotApi, WebhookHandler
 from linebot.exceptions import InvalidSignatureError
 from linebot.models import (
-    MessageEvent, PostbackEvent, JoinEvent, LeaveEvent, MemberJoinEvent, MemberLeaveEvent,
-    FollowEvent, UnfollowEvent, BeaconEvent, AccountLinkEvent, DeviceLinkEvent, DeviceUnlinkEvent,
+    MessageEvent, PostbackEvent, JoinEvent, LeaveEvent, MemberJoinedEvent, MemberLeftEvent,
+    FollowEvent, UnfollowEvent, BeaconEvent, AccountLinkEvent,
     TextSendMessage, StickerSendMessage, ImageSendMessage, VideoSendMessage, AudioSendMessage,
     LocationSendMessage, FlexSendMessage, TemplateSendMessage,
     MessageAction, PostbackAction, DatetimePickerAction, LocationAction, URIAction, CameraAction, CameraRollAction, 
     TextMessage, StickerMessage, ImageMessage, VideoMessage, AudioMessage, FileMessage, LocationMessage,
-    BubbleContainer, ImageComponent, BoxComponent, TextComponent, SpacerComponent, IconComponent, ButtonComponent, SeperatorComponent, 
+    BubbleContainer, ImageComponent, BoxComponent, TextComponent, SpacerComponent, IconComponent, ButtonComponent, SeparatorComponent, 
     ButtonsTemplate, CarouselTemplate, CarouselColumn, ImageCarouselTemplate, ImageCarouselColumn,
     ConfirmTemplate, QuickReply, QuickReplyButton)
 import configparser as cfg
