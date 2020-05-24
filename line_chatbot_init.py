@@ -4,7 +4,16 @@ import os
 from flask import Flask, request, abort
 from linebot import LineBotApi, WebhookHandler
 from linebot.exceptions import InvalidSignatureError
-from linebot.models import MessageEvent, TextMessage, TextSendMessage
+from linebot.models import (
+    MessageEvent, PostbackEvent, JoinEvent, LeaveEvent, MemberJoinEvent, MemberLeaveEvent,
+    FollowEvent, UnfollowEvent, BeaconEvent, AccountLinkEvent, DeviceLinkEvent, DeviceUnlinkEvent,
+    TextSendMessage, StickerSendMessage, ImageSendMessage, VideoSendMessage, AudioSendMessage,
+    LocationSendMessage, FlexSendMessage, TemplateSendMessage,
+    MessageAction, PostbackAction, DatetimePickerAction, LocationAction, URIAction, CameraAction, CameraRollAction, 
+    TextMessage, StickerMessage, ImageMessage, VideoMessage, AudioMessage, FileMessage, LocationMessage,
+    BubbleContainer, ImageComponent, BoxComponent, TextComponent, SpacerComponent, IconComponent, ButtonComponent, SeperatorComponent, 
+    ButtonsTemplate, CarouselTemplate, CarouselColumn, ImageCarouselTemplate, ImageCarouselColumn,
+    ConfirmTemplate, QuickReply, QuickReplyButton)
 import configparser as cfg
 
 app = Flask(__name__)
