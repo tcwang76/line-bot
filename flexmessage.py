@@ -1,10 +1,32 @@
 #請把Flexmessage集中在這邊
 
-#活動類型（選單）(quick_reply)
+#活動類型（選單）(by Tina)
+    elif text == "活動類型":
+        message = TextSendMessage(
+                text = "Quick reply",
+                quick_reply = QuickReply(
+                    items = [
+                        QuickReplyButton(
+                            action = MessageAction(label = "登山踏青", text = "登山踏青")
+                            ),
+                        QuickReplyButton(
+                            action = MessageAction(label = "桌遊麻將", text = "桌遊麻將")
+                            ),
+                        QuickReplyButton(
+                            action = MessageAction(label = "吃吃喝喝", text = "吃吃喝喝")
+                            ),
+                        QuickReplyButton(
+                            action = MessageAction(label = "唱歌跳舞", text = "唱歌跳舞")
+                            )
+                        ]))
+        
+        line_bot_api.reply_message(
+            event.reply_token,
+            message
+            )
 
 
-#活動名稱
-#push到heroku上目前還沒成功QQ (by Tina)
+#活動名稱 (by Tina)
     if text == "活動名稱":
         bubble = BubbleContainer(
             direction = "ltr",
