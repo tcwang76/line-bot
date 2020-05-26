@@ -122,8 +122,28 @@ if text == "活動地點":
             )
 
 
-#預期人數（最低最高）
-
+#預期人數（最低最高）(By Lipet)
+if text == "活動人數":
+        bubble =BubbleContainer(
+                direction= "ltr",
+                body=BoxComponent(
+                  layout= "vertical",
+                  contents=[
+                  TextComponent(
+                      text="請填寫活動參加人數",
+                      size= "lg",
+                      align= "center",
+                      weight= "bold"
+                      )
+                  ]
+                )
+            )
+        
+        message = FlexSendMessage(alt_text = "請填寫人數", contents = bubble)
+        line_bot_api.reply_message(
+            event.reply_token,
+            message
+            )
 
 #預計支出(By Lipet)
 if text == "活動支出":
@@ -234,7 +254,7 @@ if text == "活動照片":
             )
 
 #主揪姓名(By Lipet)
-if text == "姓名":
+if text == "主揪姓名":
         bubble =BubbleContainer(
                 direction= "ltr",
                 body=BoxComponent(
@@ -257,20 +277,121 @@ if text == "姓名":
             )
 
 
-#主揪電話
-
+#主揪電話(Bt Lipet)
+if text == "主揪電話":
+        bubble =BubbleContainer(
+                direction= "ltr",
+                body=BoxComponent(
+                  layout= "vertical",
+                  contents=[
+                  TextComponent(
+                      text="請提供可以聯絡您的電話號碼",
+                      size= "lg",
+                      align= "center",
+                      weight= "bold"
+                      )
+                  ]
+                )
+            )
+        
+        message = FlexSendMessage(alt_text = "請提供電話", contents = bubble)
+        line_bot_api.reply_message(
+            event.reply_token,
+            message
+            )
 
 #主揪e-mail
-
+if text == "主揪信箱":
+        bubble =BubbleContainer(
+                direction= "ltr",
+                body=BoxComponent(
+                  layout= "vertical",
+                  contents=[
+                  TextComponent(
+                      text="請提供可以聯絡您的電子信箱",
+                      size= "lg",
+                      align= "center",
+                      weight= "bold"
+                      )
+                  ]
+                )
+            )
+        
+        message = FlexSendMessage(alt_text = "請提供信箱", contents = bubble)
+        line_bot_api.reply_message(
+            event.reply_token,
+            message
+            )
 
 #參加者姓名
-
+if text == "跟團姓名":
+        bubble =BubbleContainer(
+                direction= "ltr",
+                body=BoxComponent(
+                  layout= "vertical",
+                  contents=[
+                  TextComponent(
+                      text="請提供您的姓名或是可以辨識之暱稱",
+                      size= "lg",
+                      align= "center",
+                      weight= "bold"
+                      )
+                  ]
+                )
+            )
+        
+        message = FlexSendMessage(alt_text = "請提供名稱", contents = bubble)
+        line_bot_api.reply_message(
+            event.reply_token,
+            message
+            )
 
 #參加者電話
+if text == "跟團電話":
+        bubble =BubbleContainer(
+                direction= "ltr",
+                body=BoxComponent(
+                  layout= "vertical",
+                  contents=[
+                  TextComponent(
+                      text="請提供可以聯絡您的電話號碼",
+                      size= "lg",
+                      align= "center",
+                      weight= "bold"
+                      )
+                  ]
+                )
+            )
+        
+        message = FlexSendMessage(alt_text = "請提供電話", contents = bubble)
+        line_bot_api.reply_message(
+            event.reply_token,
+            message
+            )
 
 
 #參加者e-mail
-
+if text == "主揪信箱":
+        bubble =BubbleContainer(
+                direction= "ltr",
+                body=BoxComponent(
+                  layout= "vertical",
+                  contents=[
+                  TextComponent(
+                      text="請提供可以聯絡您的電子信箱",
+                      size= "lg",
+                      align= "center",
+                      weight= "bold"
+                      )
+                  ]
+                )
+            )
+        
+        message = FlexSendMessage(alt_text = "請提供信箱", contents = bubble)
+        line_bot_api.reply_message(
+            event.reply_token,
+            message
+            )
 
 #開團Summary
 
