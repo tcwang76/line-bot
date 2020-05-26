@@ -79,7 +79,7 @@ if text == "活動時間":
                   ]
                 )
             )
-        
+   
         message = FlexSendMessage(alt_text = "請挑選活動時間", contents = bubble)
         line_bot_api.reply_message(
             event.reply_token,
@@ -108,7 +108,7 @@ if text == "活動地點":
                     ButtonComponent(
                       URIAction(
                         label= "點我選地點",
-                        uri= "line.me/R/nv/location"
+                        uri= "https://line.me/R/nv/location"
                       )
                     )
                   ]
