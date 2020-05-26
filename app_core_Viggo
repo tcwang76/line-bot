@@ -64,6 +64,18 @@ def echo(event):
             cursor.close()
             conn.close()
 
+        #中途想結束輸入~delete, 把initial那列刪除
+        elif event.message.text == "~delete":
+            line_bot_api.reply_message(
+                event.reply_token,
+                TextSendMessage(text='delete!!')
+            )
+
+            postgres_delete_query = f"""DELETE FROM group_data WHERE (condition) = ('initial');"""
+            cursor.execute(postgres_delete_query)
+            conn.commit()
+
+
         #如果有創建了一列, 則接下來的資料繼續寫入
         else:
             postgres_select_query = f"""SELECT * FROM group_data WHERE condition = 'initial';"""
