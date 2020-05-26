@@ -125,19 +125,136 @@ if text == "活動地點":
 #預期人數（最低最高）
 
 
-#預計支出
+#預計支出(By Lipet)
+if text == "活動支出":
+        bubble =BubbleContainer(
+                direction= "ltr",
+                body=BoxComponent(
+                  layout= "vertical",
+                  contents=[
+                  TextComponent(
+                      text="請填寫預計支出",
+                      size= "lg",
+                      align= "center",
+                      weight= "bold"
+                      )
+                  ]
+                )
+            )
+        
+        message = FlexSendMessage(alt_text = "請填寫預計支出", contents = bubble)
+        line_bot_api.reply_message(
+            event.reply_token,
+            message
+            )
+
+#報名截止日期(line 內建可用)(By Lipet)
+if text == "截止時間":
+        bubble =BubbleContainer(
+                direction= "ltr",
+                body=BoxComponent(
+                  layout= "vertical",
+                  contents=[
+                  TextComponent(
+                      text="請選擇報名截止時間",
+                      size= "lg",
+                      align= "center",
+                      weight= "bold"
+                      )
+                  ]
+                ),
+                footer=BoxComponent(
+                  layout= "horizontal",
+                  contents= [
+                    ButtonComponent(
+                      DatetimePickerAction(
+                        label= "點我選時間",
+                        data="Activity_time",
+                        mode= "datetime",
+                        initial= "2020-05-26T15:25",
+                        max= "2021-05-26T15:25",
+                        min= "2019-05-26T15:25"
+                      )
+                    )
+                  ]
+                )
+            )
+   
+        message = FlexSendMessage(alt_text = "請挑選報名截止時間", contents = bubble)
+        line_bot_api.reply_message(
+            event.reply_token,
+            message
+            )
 
 
-#報名截止日期(line 內建可用)
+#活動的描述(optional)(By Lipet)
+if text == "活動描述":
+        bubble =BubbleContainer(
+                direction= "ltr",
+                body=BoxComponent(
+                  layout= "vertical",
+                  contents=[
+                  TextComponent(
+                      text="請填寫詳細活動內容",
+                      size= "lg",
+                      align= "center",
+                      weight= "bold"
+                      )
+                  ]
+                )
+            )
+        
+        message = FlexSendMessage(alt_text = "請填寫活動內容", contents = bubble)
+        line_bot_api.reply_message(
+            event.reply_token,
+            message
+            )
 
+#活動照片(optional)(By Lipet)
+if text == "活動照片":
+        bubble =BubbleContainer(
+                direction= "ltr",
+                body=BoxComponent(
+                  layout= "vertical",
+                  contents=[
+                  TextComponent(
+                      text="請提供照片網址，若無網址請先上船隻網路平台（imgurl...等）",
+                      size= "lg",
+                      align= "center",
+                      weight= "bold"
+                      )
+                  ]
+                )
+            )
+        
+        message = FlexSendMessage(alt_text = "請提供照片網址", contents = bubble)
+        line_bot_api.reply_message(
+            event.reply_token,
+            message
+            )
 
-#活動的描述(optional)
-
-
-#活動照片(optional)
-
-
-#主揪姓名
+#主揪姓名(By Lipet)
+if text == "姓名":
+        bubble =BubbleContainer(
+                direction= "ltr",
+                body=BoxComponent(
+                  layout= "vertical",
+                  contents=[
+                  TextComponent(
+                      text="請提供您的姓名或是可以辨識之暱稱",
+                      size= "lg",
+                      align= "center",
+                      weight= "bold"
+                      )
+                  ]
+                )
+            )
+        
+        message = FlexSendMessage(alt_text = "請提供名稱", contents = bubble)
+        line_bot_api.reply_message(
+            event.reply_token,
+            message
+            )
 
 
 #主揪電話
