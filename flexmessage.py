@@ -49,7 +49,7 @@
             )
 
 #活動時間
-if event.message.text == "活動時間":
+if text == "活動時間":
         bubble =BubbleContainer(
                 direction= "ltr",
                 body=BoxComponent(
@@ -106,7 +106,7 @@ if text == "活動地點":
                   layout= "horizontal",
                   contents= [
                     ButtonComponent(
-                      UriAction(
+                      URIAction(
                         label= "點我選地點",
                         uri= "line.me/R/nv/location"
                       )
