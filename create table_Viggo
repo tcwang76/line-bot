@@ -1,0 +1,33 @@
+import os
+import psycopg2
+
+DATABASE_URL = os.popen('heroku config:get DATABASE_URL -a shao-haha').read()[:-1]
+
+conn = psycopg2.connect(DATABASE_URL, sslmode='require')
+
+cursor = conn.cursor()
+
+create_table =  '''CREATE TABLE group_data(
+           record_no serial PRIMARY KEY,
+           activity_type VARCHAR (50),
+           activity_name VARCHAR (50),
+           activity_time VARCHAR (50),
+           location VARCHAR (50),
+           people VARCHAR (50),
+           cost VARCHAR (50),
+           due_time VARCHAR (50),
+           description TEXT,
+           photo TEXT,
+           your_name VARCHAR (50),
+           your_phone VARCHAR (10),
+           your_mail VARCHAR (50),
+           condition VARCHAR (50)
+        );'''
+
+
+cursor.execute(create_table)
+
+conn.commit()
+
+cursor.close()
+conn.close()
