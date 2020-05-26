@@ -66,59 +66,90 @@ def echo(event):
 
         #如果有創建了一列, 則接下來的資料繼續寫入
         else:
-            try :
-                postgres_select_query = f"""SELECT * FROM group_data WHERE condition = 'initial';"""
-                cursor.execute(postgres_select_query)
-                data = cursor.fetchone()
+            postgres_select_query = f"""SELECT * FROM group_data WHERE condition = 'initial';"""
+            cursor.execute(postgres_select_query)
+            data = cursor.fetchone()
 
-                i = data.index(None)
+            column_all = ['record_no', 'activity_type', 'activity_name', 'activity_time', 'location', 'people', 'cost', 'due_time', 'description', 'photo', 'your_name', 'your_phone', 'your_mail', 'condition']
 
-                column_all = ['record_no', 'activity_type', 'activity_name', 'activity_time', 'location', 'people', 'cost', 'due_time', 'description', 'photo', 'your_name', 'your_phone', 'your_mail', 'condition']
-                record = event.message.text
-
-                #如果使用者輸入的資料不符合資料庫的資料型態, 則輸入N/A
-                if event.message.type == 'text':
-                    postgres_update_query = f"""UPDATE group_data SET {column_all[i]} = '{record}' WHERE condition = 'initial';"""
-                    cursor.execute(postgres_update_query)
-                    conn.commit()
-                else:
-                    postgres_update_query = f"""UPDATE group_data SET {column_all[i]} = 'N/A' WHERE condition = 'initial';"""
-                    cursor.execute(postgres_update_query)
-                    conn.commit()
+            if data:
+                
+                if None in data:
+                    i = data.index(None)
                     
-               #如果還沒輸入到最後一格, 則繼續詢問下一題
-                if i < len(column_all)-2:        
-                    line_bot_api.reply_message(
-                        event.reply_token,
-                        TextSendMessage(text= f'tell me the {column_all[i+1]}')
-                    )
-                    cursor.close()
-                    conn.close()
-                #如果已經到最後一格, condition改為finish, 回覆summary，
-                elif i == len(column_all)-2:
-                    postgres_update_query = f"""UPDATE group_data SET condition = 'finish' WHERE condition = 'initial';"""
-                    cursor.execute(postgres_update_query)
-                    conn.commit()
-
-                    postgres_select_query = f"""SELECT * FROM group_data ORDER BY record_no DESC;"""
+                    record = event.message.text
+                    #如果使用者輸入的資料不符合資料庫的資料型態, 則輸入N/A
+                    if event.message.type == 'text':
+                        postgres_update_query = f"""UPDATE group_data SET {column_all[i]} = '{record}' WHERE condition = 'initial';"""
+                        cursor.execute(postgres_update_query)
+                        conn.commit()
+                    else:
+                        postgres_update_query = f"""UPDATE group_data SET {column_all[i]} = 'N/A' WHERE condition = 'initial';"""
+                        cursor.execute(postgres_update_query)
+                        conn.commit()
+                    
+                   #如果還沒輸入到最後一格, 則繼續詢問下一題
+                    postgres_select_query = f"""SELECT * FROM group_data WHERE condition = 'initial';"""
                     cursor.execute(postgres_select_query)
                     data = cursor.fetchone()
-    
-                    summary_lst = []
-                    for j in range(1,len(data)-1):
-                        summary_lst.append(f"{column_all[j]}:{data[j]}")
-                    summary = "\n".join(summary_lst)
-                    
-                    line_bot_api.reply_message(
-                        event.reply_token,
-                        TextSendMessage(text=summary)
-                    )
-                    print("finish")
-                    cursor.close()
-                    conn.close()
+                
+                    if None in data:        
+                        line_bot_api.reply_message(
+                            event.reply_token,
+                            TextSendMessage(text= f'tell me the {column_all[i+1]}')
+                        )
 
+                    #如果已經到最後一格, condition改為finish, 回覆summary，
+                    elif None not in data:
+                        
+                        postgres_select_query = f"""SELECT * FROM group_data ORDER BY record_no DESC;"""
+                        cursor.execute(postgres_select_query)
+                        data = cursor.fetchone()
+    
+                        summary_lst = []
+                        for j in range(1,len(data)-1):
+                            summary_lst.append(f"{column_all[j]}:{data[j]}")
+                        summary = "\n".join(summary_lst)+"\n\nIf all infomation is correct, please enter [correct], otherwise please enter the column you want to edit"
+                    
+                        line_bot_api.reply_message(
+                            event.reply_token,
+                            TextSendMessage(text=summary)
+                        )
   
-            except AttributeError:
+                else:
+                    if event.message.text == 'correct':
+
+                        postgres_update_query = f"""UPDATE group_data SET condition = 'finish' WHERE condition = 'initial';"""
+                        cursor.execute(postgres_update_query)
+                        conn.commit()
+
+                        line_bot_api.reply_message(
+                            event.reply_token,
+                            TextSendMessage(text="finish!!")
+                        )
+
+                        cursor.close()
+                        conn.close()
+                        
+                    else:
+                        column = event.message.text
+                        if column in column_all:
+                            postgres_update_query = f"""UPDATE group_data SET {column} = Null WHERE condition = 'initial';"""
+                            cursor.execute(postgres_update_query)
+                            conn.commit()
+
+                            line_bot_api.reply_message(
+                                event.reply_token,
+                                TextSendMessage(text= f'tell me the {column}')
+                            )
+                        else :
+                            line_bot_api.reply_message(
+                                event.reply_token,
+                                TextSendMessage(text= 'please enter the column you want to edit')
+                            )
+
+            else:
+
                 if event.message.text.encode('utf-8') == Hi_code:
                     line_bot_api.reply_message(
                         event.reply_token,
