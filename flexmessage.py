@@ -394,7 +394,352 @@ if text == "主揪信箱":
             )
 
 #開團Summary
-
+{
+  "type": "flex",
+  "altText": "Flex Message",
+  "contents": {
+    "type": "bubble",
+    "direction": "ltr",
+    "header": {
+      "type": "box",
+      "layout": "vertical",
+      "contents": [
+        {
+          "type": "text",
+          "text": "請確認開團資訊",
+          "size": "lg",
+          "align": "center",
+          "weight": "bold",
+          "color": "#000000"
+        }
+      ]
+    },
+    "body": {
+      "type": "box",
+      "layout": "vertical",
+      "contents": [
+        {
+          "type": "box",
+          "layout": "vertical",
+          "contents": [
+            {
+              "type": "text",
+              "text": "活動類型",
+              "align": "start",
+              "action": {
+                "type": "postback",
+                "label": "activity_type",
+                "text": "activity_type",
+                "data": "activity_type"
+              }
+            },
+            {
+              "type": "button",
+              "action": {
+                "type": "postback",
+                "label": "更改",
+                "data": "Input"
+              },
+              "margin": "none",
+              "height": "sm"
+            }
+          ]
+        },
+        {
+          "type": "box",
+          "layout": "vertical",
+          "contents": [
+            {
+              "type": "text",
+              "text": "活動名稱",
+              "action": {
+                "type": "postback",
+                "label": "activity_name",
+                "text": "activity_name",
+                "data": "activity_name"
+              }
+            },
+            {
+              "type": "button",
+              "action": {
+                "type": "postback",
+                "label": "更改",
+                "data": "Input"
+              },
+              "margin": "none",
+              "height": "sm"
+            }
+          ]
+        },
+        {
+          "type": "box",
+          "layout": "vertical",
+          "contents": [
+            {
+              "type": "text",
+              "text": "活動時間",
+              "action": {
+                "type": "postback",
+                "label": "activity_time",
+                "text": "activity_time",
+                "data": "activity_time"
+              }
+            },
+            {
+              "type": "button",
+              "action": {
+                "type": "postback",
+                "label": "更改",
+                "data": "使用者輸入"
+              },
+              "gravity": "top"
+            }
+          ]
+        },
+        {
+          "type": "box",
+          "layout": "vertical",
+          "contents": [
+            {
+              "type": "text",
+              "text": "活動地點",
+              "action": {
+                "type": "postback",
+                "label": "location",
+                "text": "location",
+                "data": "location"
+              }
+            },
+            {
+              "type": "button",
+              "action": {
+                "type": "postback",
+                "label": "更改",
+                "data": "使用者輸入"
+              },
+              "gravity": "top"
+            }
+          ]
+        },
+        {
+          "type": "box",
+          "layout": "vertical",
+          "contents": [
+            {
+              "type": "text",
+              "text": "預期人數(最低/最高)",
+              "action": {
+                "type": "postback",
+                "label": "people",
+                "text": "people",
+                "data": "people"
+              }
+            },
+            {
+              "type": "button",
+              "action": {
+                "type": "postback",
+                "label": "更改",
+                "data": "使用者輸入"
+              },
+              "gravity": "top"
+            }
+          ]
+        },
+        {
+          "type": "box",
+          "layout": "vertical",
+          "contents": [
+            {
+              "type": "text",
+              "text": "預計支出",
+              "action": {
+                "type": "postback",
+                "label": "cost",
+                "text": "cost",
+                "data": "cost"
+              }
+            },
+            {
+              "type": "button",
+              "action": {
+                "type": "postback",
+                "label": "更改",
+                "data": "使用者輸入"
+              },
+              "gravity": "top"
+            }
+          ]
+        },
+        {
+          "type": "box",
+          "layout": "vertical",
+          "contents": [
+            {
+              "type": "text",
+              "text": "報名截止日期",
+              "action": {
+                "type": "postback",
+                "label": "due_time",
+                "text": "due_time",
+                "data": "due_time"
+              }
+            },
+            {
+              "type": "button",
+              "action": {
+                "type": "postback",
+                "label": "更改",
+                "data": "使用者輸入"
+              },
+              "gravity": "top"
+            }
+          ]
+        },
+        {
+          "type": "box",
+          "layout": "vertical",
+          "contents": [
+            {
+              "type": "text",
+              "text": "活動敘述(optional)",
+              "action": {
+                "type": "postback",
+                "label": "description",
+                "text": "description",
+                "data": "description"
+              }
+            },
+            {
+              "type": "button",
+              "action": {
+                "type": "postback",
+                "label": "更改",
+                "data": "使用者輸入"
+              },
+              "gravity": "top"
+            }
+          ]
+        },
+        {
+          "type": "box",
+          "layout": "vertical",
+          "contents": [
+            {
+              "type": "text",
+              "text": "活動照片(optional)",
+              "action": {
+                "type": "postback",
+                "label": "photo",
+                "text": "photo",
+                "data": "photo"
+              }
+            },
+            {
+              "type": "button",
+              "action": {
+                "type": "postback",
+                "label": "更改",
+                "data": "使用者輸入"
+              },
+              "gravity": "top"
+            }
+          ]
+        },
+        {
+          "type": "box",
+          "layout": "vertical",
+          "contents": [
+            {
+              "type": "text",
+              "text": "您的姓名(報名完成後提供給團員)",
+              "action": {
+                "type": "postback",
+                "label": "your_name",
+                "text": "your_name",
+                "data": "your_name"
+              }
+            },
+            {
+              "type": "button",
+              "action": {
+                "type": "postback",
+                "label": "更改",
+                "data": "使用者輸入"
+              },
+              "gravity": "top"
+            }
+          ]
+        },
+        {
+          "type": "box",
+          "layout": "vertical",
+          "contents": [
+            {
+              "type": "text",
+              "text": "您的電話(報名完成後提供給團員)",
+              "action": {
+                "type": "postback",
+                "label": "your_phone",
+                "text": "your_phone",
+                "data": "your_phone"
+              }
+            },
+            {
+              "type": "button",
+              "action": {
+                "type": "postback",
+                "label": "更改",
+                "data": "使用者輸入"
+              },
+              "gravity": "top"
+            }
+          ]
+        },
+        {
+          "type": "box",
+          "layout": "vertical",
+          "contents": [
+            {
+              "type": "text",
+              "text": "您的email(報名完成後提供給團員)",
+              "action": {
+                "type": "postback",
+                "label": "your_mail",
+                "text": "your_mail",
+                "data": "your_mail"
+              }
+            },
+            {
+              "type": "button",
+              "action": {
+                "type": "postback",
+                "label": "更改",
+                "data": "使用者輸入"
+              },
+              "gravity": "top"
+            }
+          ]
+        }
+      ]
+    },
+    "footer": {
+      "type": "box",
+      "layout": "horizontal",
+      "contents": [
+        {
+          "type": "button",
+          "action": {
+            "type": "message",
+            "label": "確認",
+            "text": "確認"
+          },
+          "margin": "md"
+        }
+      ]
+    }
+  }
+}
 
 #報名Summary
 
