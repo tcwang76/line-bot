@@ -394,6 +394,252 @@ if text == "主揪信箱":
             )
 
 #開團Summary
+
+if text == "":
+    
+    bubble = BubbleContainer(
+                    direction = "ltr",
+                    header = BoxComponent(
+                      layout = "vertical",
+                      contents = [
+                      TextComponent(
+                          text = "請確認開團資訊：",
+                          weight = "bold",
+                          size = "md",
+                          align = "start",
+                          color = "#000000"
+                          )
+                      ]
+                    ),
+                    body = BoxComponent(
+                        layout = "vertical",
+                        contents = [
+                            BoxComponent(
+                                layout = "horizontal",
+                                contents = [
+                                    TextComponent(
+                                        text = "活動類型",
+                                        size = "md",
+                                        align = "start"
+                                    ),
+                                    ButtonComponent(
+                                        style = "primary",
+                                        action = MessageAction(
+                                            label = "修改",
+                                            text = "活動類型"
+                                        )
+                                    )
+                                ]
+                            ),
+                            BoxComponent(
+                                layout = "horizontal",
+                                contents = [
+                                    TextComponent(
+                                        text = "活動名稱",
+                                        size = "md",
+                                        align = "start"
+                                    ),
+                                    ButtonComponent(
+                                        style = "primary",
+                                        action = MessageAction(
+                                            label = "修改",
+                                            text = "活動名稱"
+                                        )
+                                    )
+                                ]
+                            ),
+                            BoxComponent(
+                                layout = "horizontal",
+                                contents = [
+                                    TextComponent(
+                                        text = "活動時間",
+                                        size = "md",
+                                        align = "start"
+                                    ),
+                                    ButtonComponent(
+                                        style = "primary",
+                                        action = MessageAction(
+                                            label = "修改",
+                                            text = "活動時間"
+                                        )
+                                    )
+                                ]
+                            ),
+                            BoxComponent(
+                                layout = "horizontal",
+                                contents = [
+                                    TextComponent(
+                                        text = "活動地點",
+                                        size = "md",
+                                        align = "start"
+                                    ),
+                                    ButtonComponent(
+                                        style = "primary",
+                                        action = MessageAction(
+                                            label = "修改",
+                                            text = "活動地點"
+                                        )
+                                    )
+                                ]
+                            ),
+                            BoxComponent(
+                                layout = "horizontal",
+                                contents = [
+                                    TextComponent(
+                                        text = "活動人數",
+                                        size = "md",
+                                        align = "start"
+                                    ),
+                                    ButtonComponent(
+                                        style = "primary",
+                                        action = MessageAction(
+                                            label = "修改",
+                                            text = "活動人數"
+                                        )
+                                    )
+                                ]
+                            ),
+                            BoxComponent(
+                                layout = "horizontal",
+                                contents = [
+                                    TextComponent(
+                                        text = "活動費用",
+                                        size = "md",
+                                        align = "start"
+                                    ),
+                                    ButtonComponent(
+                                        style = "primary",
+                                        action = MessageAction(
+                                            label = "修改",
+                                            text = "活動費用"
+                                        )
+                                    )
+                                ]
+                            ),
+                            BoxComponent(
+                                layout = "horizontal",
+                                contents = [
+                                    TextComponent(
+                                        text = "活動報名截止時間",
+                                        size = "md",
+                                        align = "start"
+                                    ),
+                                    ButtonComponent(
+                                        style = "primary",
+                                        action = MessageAction(
+                                            label = "修改",
+                                            text = "活動報名截止時間"
+                                        )
+                                    )
+                                ]
+                            ),
+                            BoxComponent(
+                                layout = "horizontal",
+                                contents = [
+                                    TextComponent(
+                                        text = "活動敘述",
+                                        size = "md",
+                                        align = "start"
+                                    ),
+                                    ButtonComponent(
+                                        style = "primary",
+                                        action = MessageAction(
+                                            label = "修改",
+                                            text = "活動敘述"
+                                        )
+                                    )
+                                ]
+                            ),
+                            BoxComponent(
+                                layout = "horizontal",
+                                contents = [
+                                    TextComponent(
+                                        text = "活動照片",
+                                        size = "md",
+                                        align = "start"
+                                    ),
+                                    ButtonComponent(
+                                        style = "primary",
+                                        action = MessageAction(
+                                            label = "修改",
+                                            text = "活動照片"
+                                        )
+                                    )
+                                ]
+                            ),
+                            BoxComponent(
+                                layout = "horizontal",
+                                contents = [
+                                    TextComponent(
+                                        text = "主揪姓名",
+                                        size = "md",
+                                        align = "start"
+                                    ),
+                                    ButtonComponent(
+                                        style = "primary",
+                                        action = MessageAction(
+                                            label = "修改",
+                                            text = "主揪姓名"
+                                        )
+                                    )
+                                ]
+                            ),
+                            BoxComponent(
+                                layout = "horizontal",
+                                contents = [
+                                    TextComponent(
+                                        text = "主揪電話",
+                                        size = "md",
+                                        align = "start"
+                                    ),
+                                    ButtonComponent(
+                                        style = "primary",
+                                        action = MessageAction(
+                                            label = "修改",
+                                            text = "主揪電話"
+                                        )
+                                    )
+                                ]
+                            ),
+                            BoxComponent(
+                                layout = "horizontal",
+                                contents = [
+                                    TextComponent(
+                                        text = "主揪email",
+                                        size = "md",
+                                        align = "start"
+                                    ),
+                                    ButtonComponent(
+                                        style = "primary",
+                                        action = MessageAction(
+                                            label = "修改",
+                                            text = "主揪email"
+                                        )
+                                    )
+                                ]
+                            ),
+                        ]
+                    ),
+                    footer = BoxComponent(
+                        layout = "vertical",
+                        contents = [
+                            ButtonComponent(
+                                style = "primary",
+                                action = MessageAction(
+                                    label = "確認開團",
+                                    text = "確認開團"
+                                )
+                            )
+                        ]
+                    )
+    )
+    
+    message = FlexSendMessage(alt_text = "請確認開團資訊", contents = bubble)
+    line_bot_api.reply_message(
+        event.reply_token,
+        message
+        )
+
 {
   "type": "flex",
   "altText": "Flex Message",
