@@ -7,7 +7,7 @@ from linebot.models import (
     TextComponent, SpacerComponent, IconComponent, ButtonComponent,
     SeparatorComponent, QuickReply, QuickReplyButton
 )
-def flex(i):
+def flex(i,date):
     if i == 1 or i =="activity_name":
         msg=activity_name
     elif i == 2 or i =="activity_time":
@@ -18,8 +18,8 @@ def flex(i):
         msg=people
     elif i == 8 or i == "cost":
         msg=cost
-    elif i == 9 or i == "due_time":
-        msg=due_time
+    elif i == 9 or i == "due_date":
+        msg=due_time(date)
     elif i == 10 or i == "description":
         msg=description
     elif i == 11 or i == "photo":
@@ -166,35 +166,37 @@ cost=FlexSendMessage(
     )
 )
 
-due_time=FlexSendMessage(
-    alt_text = "請挑選截止日期", 
-    contents = BubbleContainer(
-        direction= "ltr",
-        body=BoxComponent(
-          layout= "vertical",
-          contents=[
-          TextComponent(
-              text="請選擇報名截止日期",
-              size= "lg",
-              align= "center",
-              weight= "bold"
-              )
-          ]
-        ),
-        footer=BoxComponent(
-          layout= "horizontal",
-          contents= [
-            ButtonComponent(
-              DatetimePickerAction(
-                label= "點我選時間",
-                data="Due_time",
-                mode= "date"
-              )
+def due_time(date):
+    due=FlexSendMessage(
+        alt_text = "請挑選截止日期", 
+        contents = BubbleContainer(
+            direction= "ltr",
+            body=BoxComponent(
+              layout= "vertical",
+              contents=[
+              TextComponent(
+                  text="請選擇報名截止日期",
+                  size= "lg",
+                  align= "center",
+                  weight= "bold"
+                  )
+              ]
+            ),
+            footer=BoxComponent(
+                layout= "horizontal",
+                contents= [ButtonComponent(
+                    DatetimePickerAction(
+                        label= "點我選時間",
+                        data="Due_time",
+                        mode= "date",
+                        max= str(date[3])
+                    )
+                )
+              ]
             )
-          ]
         )
     )
-)
+    return due
 
 description=FlexSendMessage(
     alt_text = "請填寫活動內容", 
@@ -388,7 +390,7 @@ def sumerary(data):
                                 gravity="top",
                                 weight="bold",
                                 action = MessageAction(
-                                    text = "activity_time"
+                                    text = "activity_date"
                                 )
                             )
                         ]
@@ -505,7 +507,7 @@ def sumerary(data):
                                 gravity="top",
                                 weight="bold",
                                 action = MessageAction(
-                                    text = "due_time"
+                                    text = "due_date"
                                 )
                             )
                         ]
