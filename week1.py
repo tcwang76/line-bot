@@ -61,7 +61,7 @@ def echo(event):
             conn.commit()
             
             #創建一列(condition = initial)
-            postgres_insert_query = f"""INSERT INTO group_data (condition, user_id) VALUES ('initial', '{event.source.user_id}');"""
+            postgres_insert_query = f"""INSERT INTO group_data (condition, user_id, attendent) VALUES ('initial', '{event.source.user_id}', '1');"""
             cursor.execute(postgres_insert_query)
             conn.commit()
 
@@ -87,9 +87,9 @@ def echo(event):
             data = cursor.fetchone()
             print('data = ', data)
             column_all = ['record_no', 'activity_type', 'activity_name', 
-                          'activity_time', 'location', 'people', 'cost', 
-                          'due_time', 'description', 'photo', 'your_name', 
-                          'your_phone', 'your_mail', 'condition', 'user_id']
+                          'activity_date', 'activity_time', 'location_tittle', 'lat', 'long', 'people', 'cost', 
+                          'due_date', 'description', 'photo', 'your_name', 
+                          'your_phone', 'your_mail', 'attendent', 'condition', 'user_id']
 
             if data:
                 
@@ -139,7 +139,7 @@ def echo(event):
                 else:
                     if event.message.text == '確認開團':
 
-                        postgres_update_query = f"""UPDATE group_data SET condition = 'finish' WHERE condition = 'initial' AND user_id = '{event.source.user_id}';"""
+                        postgres_update_query = f"""UPDATE group_data SET condition = 'pending' WHERE condition = 'initial' AND user_id = '{event.source.user_id}';"""
                         cursor.execute(postgres_update_query)
                         conn.commit()
 
@@ -153,7 +153,27 @@ def echo(event):
                         
                     else:
                         column = event.message.text
-                        if column in column_all:
+                         # 處理location 因為location 跟資料庫的名字不一樣
+                        if column == "location":
+                            postgres_update_query = f"""UPDATE group_data SET location_tittle = Null WHERE condition = 'initial' AND user_id = '{event.source.user_id}';"""
+                            cursor.execute(postgres_update_query)
+                            conn.commit()
+                            msg=flexmsg.flex(column)
+                            line_bot_api.reply_message(
+                                event.reply_token,
+                                msg
+                            )
+                         # 處理activity_time 因為跟資料庫的名字不一樣，會刪錯格
+                        elif column == "activity_time":
+                            postgres_update_query = f"""UPDATE group_data SET activity_date = Null WHERE condition = 'initial' AND user_id = '{event.source.user_id}';"""
+                            cursor.execute(postgres_update_query)
+                            conn.commit()
+                            msg=flexmsg.flex(column)
+                            line_bot_api.reply_message(
+                                event.reply_token,
+                                msg
+                            )
+                        elif column in column_all:
                             postgres_update_query = f"""UPDATE group_data SET {column} = Null WHERE condition = 'initial' AND user_id = '{event.source.user_id}';"""
                             cursor.execute(postgres_update_query)
                             conn.commit()
@@ -176,7 +196,7 @@ def echo(event):
                         flexmsg.sumerary
                     )
 
-                elif event.message.text.encode == "早安":
+                elif event.message.text == "早安":
                     img = 'https://pic.pimg.tw/ellenlee0409/1566550498-3560465550.jpg'
                     line_bot_api.reply_message(
                         event.reply_token,
@@ -201,17 +221,47 @@ def gathering(event):
     i = data.index(None)
     print("i =",i)
     column_all = ['record_no', 'activity_type', 'activity_name', 
-                  'activity_time', 'location', 'people', 'cost', 
-                  'due_time', 'description', 'photo', 'your_name', 
-                  'your_phone', 'your_mail', 'condition']
-    if event.postback.data == "Activity_time" or event.postback.data == "Due_time":
+                  'activity_date', 'activity_time', 'location_tittle', 'lat', 'long', 'people', 'cost', 
+                  'due_date', 'description', 'photo', 'your_name', 
+                  'your_phone', 'your_mail', 'attendent', 'condition', 'user_id']
+    #處理activity date and time
+    if event.postback.data == "Activity_time" :
 
         record = event.postback.params['datetime']
+        record=record.split("T")
+        postgres_update_query = f"""UPDATE group_data SET ({column_all[i]},{column_all[i+1]}) = ('{record[0]}','{record[1]}') WHERE condition = 'initial' AND user_id = '{event.source.user_id}';"""
+        cursor.execute(postgres_update_query)
+        conn.commit()
+        cursor.execute(postgres_select_query)
+        data = cursor.fetchone()
+
+        print("227 i = ",i)
+        if None in data:
+            msg=flexmsg.flex(i)
+            line_bot_api.reply_message(
+                event.reply_token,
+                msg)
+        elif None not in data:
+            postgres_select_query = f"""SELECT * FROM group_data ORDER BY record_no DESC;"""
+            cursor.execute(postgres_select_query)
+            data = cursor.fetchone()
+            msg=flexmsg.sumerary(data)
+            line_bot_api.reply_message(
+                event.reply_token,
+                msg
+            )
+        cursor.close()
+        conn.close()
+        #處理due date
+    elif event.postback.data == "Due_time":
+
+        record = event.postback.params['date']
         postgres_update_query = f"""UPDATE group_data SET {column_all[i]} = '{record}' WHERE condition = 'initial' AND user_id = '{event.source.user_id}';"""
         cursor.execute(postgres_update_query)
         conn.commit()
         cursor.execute(postgres_select_query)
         data = cursor.fetchone()
+
         if None in data:
             msg=flexmsg.flex(i)
             line_bot_api.reply_message(
@@ -241,16 +291,17 @@ def gathering(event):
     i = data.index(None)
     print("i =",i)
     column_all = ['record_no', 'activity_type', 'activity_name', 
-                  'activity_time', 'location', 'people', 'cost', 
-                  'due_time', 'description', 'photo', 'your_name', 
-                  'your_phone', 'your_mail', 'condition']
+                  'activity_date', 'activity_time', 'location_tittle', 'lat', 'long', 'people', 'cost', 
+                  'due_date', 'description', 'photo', 'your_name', 
+                  'your_phone', 'your_mail', 'attendent', 'condition', 'user_id']
 
-    record = "latitude"+ str(event.message.latitude)+ " longitude" + str(event.message.longitude)
-    postgres_update_query = f"""UPDATE group_data SET {column_all[i]} = '{record}' WHERE condition = 'initial' AND user_id = '{event.source.user_id}';"""
+    record =[ event.message.title, event.message.latitude, event.message.longitude]
+    postgres_update_query = f"""UPDATE group_data SET ({column_all[i]}, {column_all[i+1]}, {column_all[i+2]}) = ('{record[0]}', '{record[1]}', '{record[2]}') WHERE condition = 'initial' AND user_id = '{event.source.user_id}';"""
     cursor.execute(postgres_update_query)
     conn.commit()
     cursor.execute(postgres_select_query)
     data = cursor.fetchone()
+
     if None in data:
         msg=flexmsg.flex(i)
         line_bot_api.reply_message(
