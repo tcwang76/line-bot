@@ -6,7 +6,7 @@ from flask import Flask, request, abort
 from linebot import LineBotApi, WebhookHandler
 from linebot.exceptions import InvalidSignatureError
 from linebot.models import MessageEvent, TextMessage, TextSendMessage, ImageSendMessage, PostbackEvent, LocationMessage
-#如果你的access token跟secret有顯示在下面，請把下面這行註解掉。
+#如果你的access token跟secret有顯示在下面，請把下面這行註解掉
 import configparser
 import flexmsg
 
