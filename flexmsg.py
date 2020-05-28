@@ -15,7 +15,7 @@ def flex(i):
     elif i == 3 or i =="location":
         msg=location
     elif i == 4 or i=="people":
-        msg=attendant
+        msg=people
     elif i == 5 or i == "cost":
         msg=cost
     elif i == 6 or i == "due_time":
@@ -23,7 +23,7 @@ def flex(i):
     elif i == 7 or i == "description":
         msg=description
     elif i == 8 or i == "photo":
-        msg=pic
+        msg=photo
     elif i == 9 or i == "your_name":
         msg=name
     elif i == 10 or i =="your_phone":
@@ -133,7 +133,7 @@ location=FlexSendMessage(
     )
 )
 
-attendant=FlexSendMessage(
+people=FlexSendMessage(
     alt_text = "請填寫人數", 
     contents = BubbleContainer(
         direction= "ltr",
@@ -220,7 +220,7 @@ description=FlexSendMessage(
     )
 )
 
-pic=FlexSendMessage(
+photo=FlexSendMessage(
     alt_text = "請提供照片網址", 
     contents =BubbleContainer(
         direction= "ltr",
@@ -932,5 +932,3 @@ def sumerary(data):
 
 
 # #報名Summary
-
-
