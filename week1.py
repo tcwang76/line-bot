@@ -42,8 +42,6 @@ def callback():
 def echo(event):
     
      if event.source.user_id != "Udeadbeefdeadbeefdeadbeefdeadbeef":
-        Hi_code = b'\xe4\xbd\xa0\xe5\xa5\xbd'
-        morning_code = b'\xe6\x97\xa9\xe5\xae\x89'
         #連結到heroku資料庫
         DATABASE_URL = os.environ['DATABASE_URL']
         conn = psycopg2.connect(DATABASE_URL, sslmode='require')
@@ -63,7 +61,7 @@ def echo(event):
             conn.commit()
             
             #創建一列(condition = initial)
-            postgres_insert_query = f"""INSERT INTO group_data (condition) VALUES ('initial');"""
+            postgres_insert_query = f"""INSERT INTO group_data (condition, user_id) VALUES ('initial', '{event.source.user_id}');"""
             cursor.execute(postgres_insert_query)
             conn.commit()
 
@@ -74,24 +72,24 @@ def echo(event):
         elif event.message.text == "~delete":
             line_bot_api.reply_message(
                 event.reply_token,
-                TextSendMessage(text='delete!!')
+                TextSendMessage(text='取消成功')
             )
 
-            postgres_delete_query = f"""DELETE FROM group_data WHERE (condition) = ('initial');"""
+            postgres_delete_query = f"""DELETE FROM group_data WHERE (condition, user_id) = ('initial', '{event.source.user_id}');"""
             cursor.execute(postgres_delete_query)
             conn.commit()
 
 
         #如果有創建了一列, 則接下來的資料繼續寫入
         else:
-            postgres_select_query = f"""SELECT * FROM group_data WHERE condition = 'initial';"""
+            postgres_select_query = f"""SELECT * FROM group_data WHERE condition = 'initial' AND user_id = '{event.source.user_id}';"""
             cursor.execute(postgres_select_query)
             data = cursor.fetchone()
-
+            print('data = ', data)
             column_all = ['record_no', 'activity_type', 'activity_name', 
                           'activity_time', 'location', 'people', 'cost', 
                           'due_time', 'description', 'photo', 'your_name', 
-                          'your_phone', 'your_mail', 'condition']
+                          'your_phone', 'your_mail', 'condition', 'user_id']
 
             if data:
                 
@@ -101,16 +99,16 @@ def echo(event):
                     record = event.message.text
                     #如果使用者輸入的資料不符合資料庫的資料型態, 則輸入N/A
                     if event.message.type == 'text':
-                        postgres_update_query = f"""UPDATE group_data SET {column_all[i]} = '{record}' WHERE condition = 'initial';"""
+                        postgres_update_query = f"""UPDATE group_data SET {column_all[i]} = '{record}' WHERE condition = 'initial' AND user_id = '{event.source.user_id}';"""
                         cursor.execute(postgres_update_query)
                         conn.commit()
                     else:
-                        postgres_update_query = f"""UPDATE group_data SET {column_all[i]} = 'N/A' WHERE condition = 'initial';"""
+                        postgres_update_query = f"""UPDATE group_data SET {column_all[i]} = 'N/A' WHERE condition = 'initial'AND user_id = '{event.source.user_id}';"""
                         cursor.execute(postgres_update_query)
                         conn.commit()
                     
                    #如果還沒輸入到最後一格, 則繼續詢問下一題
-                    postgres_select_query = f"""SELECT * FROM group_data WHERE condition = 'initial';"""
+                    postgres_select_query = f"""SELECT * FROM group_data WHERE condition = 'initial'AND user_id = '{event.source.user_id}';"""
                     cursor.execute(postgres_select_query)
                     data = cursor.fetchone()
                 
@@ -141,7 +139,7 @@ def echo(event):
                 else:
                     if event.message.text == '確認開團':
 
-                        postgres_update_query = f"""UPDATE group_data SET condition = 'finish' WHERE condition = 'initial';"""
+                        postgres_update_query = f"""UPDATE group_data SET condition = 'finish' WHERE condition = 'initial' AND user_id = '{event.source.user_id}';"""
                         cursor.execute(postgres_update_query)
                         conn.commit()
 
@@ -156,7 +154,7 @@ def echo(event):
                     else:
                         column = event.message.text
                         if column in column_all:
-                            postgres_update_query = f"""UPDATE group_data SET {column} = Null WHERE condition = 'initial';"""
+                            postgres_update_query = f"""UPDATE group_data SET {column} = Null WHERE condition = 'initial' AND user_id = '{event.source.user_id}';"""
                             cursor.execute(postgres_update_query)
                             conn.commit()
                             msg=flexmsg.flex(column)
@@ -178,24 +176,25 @@ def echo(event):
                         flexmsg.sumerary
                     )
 
-                elif event.message.text.encode('utf-8') == morning_code:
+                elif event.message.text.encode == "早安":
                     img = 'https://pic.pimg.tw/ellenlee0409/1566550498-3560465550.jpg'
                     line_bot_api.reply_message(
                         event.reply_token,
                         ImageSendMessage(original_content_url=img ,preview_image_url=img)
                     )
             
-                else:    
-                    line_bot_api.reply_message(
-                        event.reply_token,
-                        TextSendMessage(text=event.message.text)
-                    )
+#                 else:    
+#                     line_bot_api.reply_message(
+#                         event.reply_token,
+#                         TextSendMessage(text=event.message.text)
+#                     )
+#處理postback 事件，例如datetime picker
 @handler.add(PostbackEvent)
 def gathering(event):
     DATABASE_URL = os.environ['DATABASE_URL']
     conn = psycopg2.connect(DATABASE_URL, sslmode='require')
     cursor = conn.cursor()
-    postgres_select_query = f"""SELECT * FROM group_data WHERE condition = 'initial';"""
+    postgres_select_query = f"""SELECT * FROM group_data WHERE condition = 'initial' AND user_id = '{event.source.user_id}';"""
     cursor.execute(postgres_select_query)
     data = cursor.fetchone()
 
@@ -208,26 +207,37 @@ def gathering(event):
     if event.postback.data == "Activity_time" or event.postback.data == "Due_time":
 
         record = event.postback.params['datetime']
-        postgres_update_query = f"""UPDATE group_data SET {column_all[i]} = '{record}' WHERE condition = 'initial';"""
+        postgres_update_query = f"""UPDATE group_data SET {column_all[i]} = '{record}' WHERE condition = 'initial' AND user_id = '{event.source.user_id}';"""
         cursor.execute(postgres_update_query)
         conn.commit()
-        if i < len(column_all)-2:   
+        cursor.execute(postgres_select_query)
+        data = cursor.fetchone()
+        if None in data:
             msg=flexmsg.flex(i)
             line_bot_api.reply_message(
                 event.reply_token,
                 msg)
-    cursor.close()
-    conn.close()
- 
+        elif None not in data:
+            postgres_select_query = f"""SELECT * FROM group_data ORDER BY record_no DESC;"""
+            cursor.execute(postgres_select_query)
+            data = cursor.fetchone()
+            msg=flexmsg.sumerary(data)
+            line_bot_api.reply_message(
+                event.reply_token,
+                msg
+            )
+        cursor.close()
+        conn.close()
+
+# location 事件
 @handler.add(MessageEvent, message=LocationMessage)
 def gathering(event):
     DATABASE_URL = os.environ['DATABASE_URL']
     conn = psycopg2.connect(DATABASE_URL, sslmode='require')
     cursor = conn.cursor()
-    postgres_select_query = f"""SELECT * FROM group_data WHERE condition = 'initial';"""
+    postgres_select_query = f"""SELECT * FROM group_data WHERE condition = 'initial' AND user_id = '{event.source.user_id}';"""
     cursor.execute(postgres_select_query)
     data = cursor.fetchone()
-
     i = data.index(None)
     print("i =",i)
     column_all = ['record_no', 'activity_type', 'activity_name', 
@@ -236,14 +246,25 @@ def gathering(event):
                   'your_phone', 'your_mail', 'condition']
 
     record = "latitude"+ str(event.message.latitude)+ " longitude" + str(event.message.longitude)
-    postgres_update_query = f"""UPDATE group_data SET {column_all[i]} = '{record}' WHERE condition = 'initial';"""
+    postgres_update_query = f"""UPDATE group_data SET {column_all[i]} = '{record}' WHERE condition = 'initial' AND user_id = '{event.source.user_id}';"""
     cursor.execute(postgres_update_query)
     conn.commit()
-    if i < len(column_all)-2:   
+    cursor.execute(postgres_select_query)
+    data = cursor.fetchone()
+    if None in data:
         msg=flexmsg.flex(i)
         line_bot_api.reply_message(
             event.reply_token,
             msg)
+    elif None not in data:
+        postgres_select_query = f"""SELECT * FROM group_data ORDER BY record_no DESC;"""
+        cursor.execute(postgres_select_query)
+        data = cursor.fetchone()
+        msg=flexmsg.sumerary(data)
+        line_bot_api.reply_message(
+            event.reply_token,
+            msg
+        )
     cursor.close()
     conn.close()
     
