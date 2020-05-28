@@ -14,21 +14,21 @@ def flex(i):
         msg=activity_time
     elif i == 3 or i =="location":
         msg=location
-    elif i == 4 or i=="people":
+    elif i == 5 or i=="people":
         msg=people
-    elif i == 5 or i == "cost":
+    elif i == 8 or i == "cost":
         msg=cost
-    elif i == 6 or i == "due_time":
+    elif i == 9 or i == "due_time":
         msg=due_time
-    elif i == 7 or i == "description":
+    elif i == 10 or i == "description":
         msg=description
-    elif i == 8 or i == "photo":
+    elif i == 11 or i == "photo":
         msg=photo
-    elif i == 9 or i == "your_name":
+    elif i == 12 or i == "your_name":
         msg=name
-    elif i == 10 or i =="your_phone":
+    elif i == 13 or i =="your_phone":
         msg=phone
-    elif i == 11 or i == "your_mail":
+    elif i == 14 or i == "your_mail":
         msg=mail
     elif i == "activity_type":
         msg=activity_type
@@ -93,10 +93,7 @@ activity_time=FlexSendMessage(
               DatetimePickerAction(
                 label= "點我選時間",
                 data="Activity_time",
-                mode= "datetime",
-                initial= "2020-05-26T15:25",
-                max= "2021-05-26T15:25",
-                min= "2019-05-26T15:25"
+                mode= "datetime"
               )
             )
           ]
@@ -170,14 +167,14 @@ cost=FlexSendMessage(
 )
 
 due_time=FlexSendMessage(
-    alt_text = "請挑選截止時間", 
+    alt_text = "請挑選截止日期", 
     contents = BubbleContainer(
         direction= "ltr",
         body=BoxComponent(
           layout= "vertical",
           contents=[
           TextComponent(
-              text="請選擇報名截止時間",
+              text="請選擇報名截止日期",
               size= "lg",
               align= "center",
               weight= "bold"
@@ -191,10 +188,7 @@ due_time=FlexSendMessage(
               DatetimePickerAction(
                 label= "點我選時間",
                 data="Due_time",
-                mode= "datetime",
-                initial= "2020-05-26T15:25",
-                max= "2021-05-26T15:25",
-                min= "2019-05-26T15:25"
+                mode= "date"
               )
             )
           ]
@@ -228,8 +222,9 @@ photo=FlexSendMessage(
           layout= "vertical",
           contents=[
           TextComponent(
-              text="請提供照片網址，若無網址\n請先上傳至網路平台（imgurl...等）",
+              text="請提供照片網址，若無網址請先上傳至網路平台（imgurl...等）",
               size= "md",
+              wrap=True,
               align= "center",
               weight= "bold"
               )
@@ -248,6 +243,7 @@ name=FlexSendMessage(
           TextComponent(
               text="請提供您的姓名或是可以辨識之暱稱",
               size= "md",
+              wrap=True,
               align= "center",
               weight= "bold"
               )
@@ -317,12 +313,24 @@ def sumerary(data):
                             TextComponent(
                                 text = f"活動類型：{data[1]}",
                                 size = "md",
+                                flex=10,
                                 align = "start"
                             ),
-                            ButtonComponent(
-                                style = "primary",
-                                action = MessageAction(
-                                    label = "修改",
+                            SeparatorComponent(
+                                margin="lg"
+                            )
+                        ]
+                    ),
+                    BoxComponent(
+                        layout = "horizontal",
+                        contents = [
+                            TextComponent(
+                                text = "修改",
+                                size = "md",
+                                align = "end",
+                                gravity="top",
+                                weight="bold",
+                                action=MessageAction(
                                     text = "activity_type"
                                 )
                             )
@@ -334,12 +342,24 @@ def sumerary(data):
                             TextComponent(
                                 text = f"活動名稱：{data[2]}",
                                 size = "md",
+                                flex=10,
                                 align = "start"
                             ),
-                            ButtonComponent(
-                                style = "primary",
+                            SeparatorComponent(
+                                margin="lg"
+                            )
+                        ]
+                    ),
+                    BoxComponent(
+                        layout = "horizontal",
+                        contents = [
+                            TextComponent(
+                                text = "修改",
+                                size = "md",
+                                align = "end",
+                                gravity="top",
+                                weight="bold",
                                 action = MessageAction(
-                                    label = "修改",
                                     text = "activity_name"
                                 )
                             )
@@ -349,14 +369,25 @@ def sumerary(data):
                         layout = "horizontal",
                         contents = [
                             TextComponent(
-                                text = f"活動時間：{data[3]}",
+                                text = f"活動時間：{data[3]} {data[4]}",
                                 size = "md",
+                                flex=10,
                                 align = "start"
                             ),
-                            ButtonComponent(
-                                style = "primary",
+                            SeparatorComponent(
+                                margin="lg"
+                            )
+                        ]
+                    ),BoxComponent(
+                        layout = "horizontal",
+                        contents = [
+                            TextComponent(
+                                text = "修改",
+                                size = "md",
+                                align = "end",
+                                gravity="top",
+                                weight="bold",
                                 action = MessageAction(
-                                    label = "修改",
                                     text = "activity_time"
                                 )
                             )
@@ -366,14 +397,27 @@ def sumerary(data):
                         layout = "horizontal",
                         contents = [
                             TextComponent(
-                                text = f"活動地點：{data[4]}",
+                                text = f"活動地點：{data[5]}",
                                 size = "md",
+                                flex=10,
+                                wrap=True,
                                 align = "start"
                             ),
-                            ButtonComponent(
-                                style = "primary",
+                            SeparatorComponent(
+                                margin="lg"
+                            )
+                        ]
+                    ),
+                    BoxComponent(
+                        layout = "horizontal",
+                        contents = [
+                            TextComponent(
+                                text = "修改",
+                                size = "md",
+                                align = "end",
+                                gravity="top",
+                                weight="bold",
                                 action = MessageAction(
-                                    label = "修改",
                                     text = "location"
                                 )
                             )
@@ -383,14 +427,26 @@ def sumerary(data):
                         layout = "horizontal",
                         contents = [
                             TextComponent(
-                                text = f"活動人數：{data[5]}",
+                                text = f"活動人數：{data[8]}",
                                 size = "md",
+                                flex=10,
                                 align = "start"
                             ),
-                            ButtonComponent(
-                                style = "primary",
+                            SeparatorComponent(
+                                margin="lg"
+                            )
+                        ]
+                    ),
+                    BoxComponent(
+                        layout = "horizontal",
+                        contents = [
+                            TextComponent(
+                                text = "修改",
+                                size = "md",
+                                align = "end",
+                                gravity="top",
+                                weight="bold",
                                 action = MessageAction(
-                                    label = "修改",
                                     text = "people"
                                 )
                             )
@@ -400,14 +456,26 @@ def sumerary(data):
                         layout = "horizontal",
                         contents = [
                             TextComponent(
-                                text = f"活動費用：{data[6]}",
+                                text = f"活動費用：{data[9]}",
                                 size = "md",
+                                flex=10,
                                 align = "start"
                             ),
-                            ButtonComponent(
-                                style = "primary",
+                            SeparatorComponent(
+                                margin="lg"
+                            )
+                        ]
+                    ),
+                    BoxComponent(
+                        layout = "horizontal",
+                        contents = [
+                            TextComponent(
+                                text = "修改",
+                                size = "md",
+                                align = "end",
+                                gravity="top",
+                                weight="bold",
                                 action = MessageAction(
-                                    label = "修改",
                                     text = "cost"
                                 )
                             )
@@ -417,14 +485,26 @@ def sumerary(data):
                         layout = "horizontal",
                         contents = [
                             TextComponent(
-                                text = f"活動報名截止時間：{data[7]}",
+                                text = f"報名截止日：{data[10]}",
                                 size = "md",
+                                flex=10,
                                 align = "start"
                             ),
-                            ButtonComponent(
-                                style = "primary",
+                            SeparatorComponent(
+                                margin="lg"
+                            )
+                        ]
+                    ),
+                    BoxComponent(
+                        layout = "horizontal",
+                        contents = [
+                            TextComponent(
+                                text = "修改",
+                                size = "md",
+                                align = "end",
+                                gravity="top",
+                                weight="bold",
                                 action = MessageAction(
-                                    label = "修改",
                                     text = "due_time"
                                 )
                             )
@@ -434,14 +514,26 @@ def sumerary(data):
                         layout = "horizontal",
                         contents = [
                             TextComponent(
-                                text = f"活動敘述：{data[8]}",
+                                text = f"活動敘述：{data[11]}",
                                 size = "md",
+                                flex=10,
                                 align = "start"
                             ),
-                            ButtonComponent(
-                                style = "primary",
+                            SeparatorComponent(
+                                margin="lg"
+                            )
+                        ]
+                    ),
+                    BoxComponent(
+                        layout = "horizontal",
+                        contents = [
+                            TextComponent(
+                                text = "修改",
+                                size = "md",
+                                align = "end",
+                                gravity="top",
+                                weight="bold",
                                 action = MessageAction(
-                                    label = "修改",
                                     text = "description"
                                 )
                             )
@@ -451,14 +543,26 @@ def sumerary(data):
                         layout = "horizontal",
                         contents = [
                             TextComponent(
-                                text = f"活動照片：{data[9]}",
+                                text = f"活動照片：{data[12]}",
                                 size = "md",
+                                flex=10,
                                 align = "start"
                             ),
-                            ButtonComponent(
-                                style = "primary",
+                            SeparatorComponent(
+                                margin="lg"
+                            )
+                        ]
+                    ),
+                    BoxComponent(
+                        layout = "horizontal",
+                        contents = [
+                            TextComponent(
+                                text = "修改",
+                                size = "md",
+                                align = "end",
+                                gravity="top",
+                                weight="bold",
                                 action = MessageAction(
-                                    label = "修改",
                                     text = "photo"
                                 )
                             )
@@ -468,14 +572,26 @@ def sumerary(data):
                         layout = "horizontal",
                         contents = [
                             TextComponent(
-                                text = f"主揪姓名：{data[10]}",
+                                text = f"主揪姓名：{data[13]}",
                                 size = "md",
+                                flex=10,
                                 align = "start"
                             ),
-                            ButtonComponent(
-                                style = "primary",
+                            SeparatorComponent(
+                                margin="lg"
+                            )
+                        ]
+                    ), 
+                    BoxComponent(
+                        layout = "horizontal",
+                        contents = [
+                            TextComponent(
+                                text = "修改",
+                                size = "md",
+                                align = "end",
+                                gravity="top",
+                                weight="bold",
                                 action = MessageAction(
-                                    label = "修改",
                                     text = "your_name"
                                 )
                             )
@@ -485,14 +601,26 @@ def sumerary(data):
                         layout = "horizontal",
                         contents = [
                             TextComponent(
-                                text = f"主揪電話：{data[11]}",
+                                text = f"主揪電話：{data[14]}",
                                 size = "md",
+                                flex=10,
                                 align = "start"
                             ),
-                            ButtonComponent(
-                                style = "primary",
+                            SeparatorComponent(
+                                margin="lg"
+                            )
+                        ]
+                    ),
+                    BoxComponent(
+                        layout = "horizontal",
+                        contents = [
+                            TextComponent(
+                                text = "修改",
+                                size = "md",
+                                align = "end",
+                                gravity="top",
+                                weight="bold",
                                 action = MessageAction(
-                                    label = "修改",
                                     text = "your_phone"
                                 )
                             )
@@ -502,19 +630,31 @@ def sumerary(data):
                         layout = "horizontal",
                         contents = [
                             TextComponent(
-                                text = f"主揪email：{data[12]}",
+                                text = f"主揪email：{data[15]}",
                                 size = "md",
+                                flex=10,
                                 align = "start"
                             ),
-                            ButtonComponent(
-                                style = "primary",
+                            SeparatorComponent(
+                                margin="lg"
+                            )
+                        ]
+                    ),
+                    BoxComponent(
+                        layout = "horizontal",
+                        contents = [
+                            TextComponent(
+                                text = "修改",
+                                size = "md",
+                                align = "end",
+                                gravity="top",
+                                weight="bold",
                                 action = MessageAction(
-                                    label = "修改",
                                     text = "your_mail"
                                 )
                             )
                         ]
-                    ),
+                    )
                 ]
             ),
             footer = BoxComponent(
