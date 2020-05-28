@@ -113,7 +113,7 @@ def echo(event):
                     data = cursor.fetchone()
                 
                     if None in data: 
-                        msg=flexmsg.flex(i)
+                        msg=flexmsg.flex(i,data)
                         line_bot_api.reply_message(
                             event.reply_token,
                             msg)
@@ -124,13 +124,7 @@ def echo(event):
                         postgres_select_query = f"""SELECT * FROM group_data ORDER BY record_no DESC;"""
                         cursor.execute(postgres_select_query)
                         data = cursor.fetchone()
-    
-                        summary_lst = []
-                        for j in range(1,len(data)-1):
-                            summary_lst.append(f"{column_all[j]}:{data[j]}")
-                        summary = "\n".join(summary_lst)+"\n\nIf all infomation is correct, please enter [correct], otherwise please enter the column you want to edit"
                         msg=flexmsg.sumerary(data)
-                        TextSendMessage(text=summary)
                         line_bot_api.reply_message(
                             event.reply_token,
                             msg
@@ -163,21 +157,11 @@ def echo(event):
                                 event.reply_token,
                                 msg
                             )
-                         # 處理activity_time 因為跟資料庫的名字不一樣，會刪錯格
-                        elif column == "activity_time":
-                            postgres_update_query = f"""UPDATE group_data SET activity_date = Null WHERE condition = 'initial' AND user_id = '{event.source.user_id}';"""
-                            cursor.execute(postgres_update_query)
-                            conn.commit()
-                            msg=flexmsg.flex(column)
-                            line_bot_api.reply_message(
-                                event.reply_token,
-                                msg
-                            )
                         elif column in column_all:
                             postgres_update_query = f"""UPDATE group_data SET {column} = Null WHERE condition = 'initial' AND user_id = '{event.source.user_id}';"""
                             cursor.execute(postgres_update_query)
                             conn.commit()
-                            msg=flexmsg.flex(column)
+                            msg=flexmsg.flex(column,data)
                             line_bot_api.reply_message(
                                 event.reply_token,
                                 msg
@@ -237,7 +221,7 @@ def gathering(event):
 
         print("227 i = ",i)
         if None in data:
-            msg=flexmsg.flex(i)
+            msg=flexmsg.flex(i,data)
             line_bot_api.reply_message(
                 event.reply_token,
                 msg)
@@ -263,7 +247,7 @@ def gathering(event):
         data = cursor.fetchone()
 
         if None in data:
-            msg=flexmsg.flex(i)
+            msg=flexmsg.flex(i,data)
             line_bot_api.reply_message(
                 event.reply_token,
                 msg)
@@ -303,7 +287,7 @@ def gathering(event):
     data = cursor.fetchone()
 
     if None in data:
-        msg=flexmsg.flex(i)
+        msg=flexmsg.flex(i,data)
         line_bot_api.reply_message(
             event.reply_token,
             msg)
