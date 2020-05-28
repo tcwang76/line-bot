@@ -21,7 +21,8 @@ create_table =  '''CREATE TABLE group_data(
            your_name VARCHAR (50),
            your_phone VARCHAR (10),
            your_mail VARCHAR (50),
-           condition VARCHAR (50)
+           condition VARCHAR (50),
+           user_id VARCHAR (50)
         );'''
 
 
