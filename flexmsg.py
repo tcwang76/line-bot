@@ -663,14 +663,14 @@ def summary(data):
                 layout = "vertical",
                 contents = [
                     ButtonComponent(
-                        style = "primary",
+                        style = "link",
                         action = MessageAction(
                             label = "確認開團",
                             text = "確認開團"
                         )
                     ),
                     ButtonComponent(
-                        style = "primary",
+                        style = "link",
                         action = MessageAction(
                             label = "取消開團",
                             text = "取消"
