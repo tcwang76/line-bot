@@ -7,6 +7,11 @@ from linebot.models import (
     TextComponent, SpacerComponent, IconComponent, ButtonComponent,
     SeparatorComponent, QuickReply, QuickReplyButton
 )
+# 給報名者用的
+def extend(j):
+    return flex(j+10)
+
+# 給開團者用的
 def flex(i,date):
     if i == 1 or i =="activity_name":
         msg=activity_name
