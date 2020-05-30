@@ -1,5 +1,5 @@
 # 跟"if event.message.text == "~open":"同階層
-elif event.message.text == "~join":
+if event.message.text == "~join":
     #~~~這裡跳出quick reply按鈕~~~
     
 else: #這個else等同第84行的else
@@ -11,7 +11,7 @@ else: #這個else等同第84行的else
     activity_type = ['登山踏青', '桌遊麻將', '吃吃喝喝', '唱歌跳舞']
     
     #以下跟第94行的"if data:"同階層
-    elif event.message.text in activity_type: #這裡的event.message.text會是上面quick reply回傳的訊息(四種type其中一種)        
+    if event.message.text in activity_type: #這裡的event.message.text會是上面quick reply回傳的訊息(四種type其中一種)        
         pass #~~跳出該type的carousel
     
     elif event.message.text == "了解更多":
