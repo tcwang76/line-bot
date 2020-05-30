@@ -1,0 +1,145 @@
+DATABASE_URL = os.popen('heroku config:get DATABASE_URL -a shao-haha').read()[:-1]
+#DATABASE_URL = os.environ['DATABASE_URL']
+conn = psycopg2.connect(DATABASE_URL, sslmode='require')
+cursor = conn.cursor()
+
+if event.message.text == "~join":
+    #~~~這裡跳出quick reply按鈕~~~
+       
+else:
+    postgres_select_query = f"""SELECT * FROM registration_data WHERE condition = 'initial' AND user_id = '{event.source.user_id}';"""
+    cursor.execute(postgres_select_query)
+    data_2 = cursor.fetchone() #準備寫入報名資料的那一列
+    column_all_registration = ['record_no', 'activity_number', 'activity_name', 'name', 'phone', 'mail', 'condition', 'user_id']
+    activity_type = ['登山踏青', '桌遊麻將', '吃吃喝喝', '唱歌跳舞']
+    
+    if event.message.text in activity_type:         
+        pass #~~跳出該type的carousel
+    
+    elif event.message.text == "了解更多":
+        pass #~~點了carousel的"了解更多"，跳出該團的summary
+    
+    elif event.message.text == "立即報名": #點了"立即報名後即回傳activity_no和activity_name"
+        #刪掉報名失敗的列
+        postgres_delete_query = f"""DELETE FROM registration_data WHERE condition = 'initial' AND user_id = '{event.source.user_id}';"""
+        cursor.execute(postgres_delete_query)
+        conn.commit()
+    
+        #創建一列
+        postgres_insert_query = f"""INSERT INTO registration_data (condition, user_id) VALUES ('initial', '{event.source.user_id}');"""
+        cursor.execute(postgres_insert_query)   
+        conn.commit()
+        
+        postgres_select_query = f"""SELECT * FROM registration_data WHERE condition = 'initial' AND user_id = '{event.source.user_id}';"""
+        cursor.execute(postgres_select_query)
+        data_2 = cursor.fetchone() #準備寫入報名資料的那一列
+        i_2 = data_2.index(None)
+        
+        msg_2 = flexmsg.flex(i_2,data_2) #flexmsg需要新增報名情境
+        line_bot_api.reply_message(
+            event.reply_token,
+            msg_2
+        )
+       
+    elif data_2:
+        if None in data_2:
+            i_2 = data_2.index(None)
+        
+            record = event.message.text
+            
+            #如果使用者輸入的電話重複
+            if i_2 == 4:
+                postgres_select_query = f"""SELECT activity_no FROM registration_data WHERE condition = 'initial' AND user_id = '{event.source.user_id}';"""
+                cursor.execute(postgres_select_query)
+                activity_no = cursor.fetchone()[0] 
+            
+                postgres_select_query = f"""SELECT phone FROM registration_data WHERE activity_no = '{activity_no}';"""
+                cursor.execute(postgres_select_query)
+                phone_registration = cursor.fetchall()
+            
+                #如果使用者輸入的電話重複則報名失敗，刪掉原本創建的列
+                for phone in phone_registration:
+                    if record in phone_registration:
+                        postgres_delete_query = f"""DELETE FROM registration_data WHERE condition = 'initial' AND user_id = '{event.source.user_id}';"""
+                        cursor.execute(postgres_delete_query)
+                        conn.commit()
+                
+                        line_bot_api.reply_message(
+                            event.reply_token,
+                            TextSendMessage(text="can not use same phone number")
+                        )
+                    #~~~出現[返回]按鈕，重新回到報名第一步(按鈕回傳~join)
+                    else:
+                        postgres_update_query = f"""UPDATE registration_data SET {column_all_registration[i_2]} = '{record}' WHERE condition = 'initial' AND user_id = '{event.source.user_id}';"""
+                        cursor.execute(postgres_update_query)
+                        conn.commit()
+                
+            else:    
+                #如果使用者輸入的資料不符合資料庫的資料型態, 則輸入N/A
+                if event.message.type == 'text':
+                    postgres_update_query = f"""UPDATE registration_data SET {column_all_registration[i_2]} = '{record}' WHERE condition = 'initial' AND user_id = '{event.source.user_id}';"""
+                    cursor.execute(postgres_update_query)
+                    conn.commit()
+                else:
+                    postgres_update_query = f"""UPDATE registration_data SET {column_all_registration[i_2]} = 'N/A' WHERE condition = 'initial'AND user_id = '{event.source.user_id}';"""
+                    cursor.execute(postgres_update_query)
+                    conn.commit()  
+
+                postgres_select_query = f"""SELECT * FROM registration_data WHERE condition = 'initial' AND user_id = '{event.source.user_id}';"""
+                cursor.execute(postgres_select_query)
+                data_2 = cursor.fetchone() #準備寫入報名資料的那一列    
+                if None in data_2:
+                    msg_2 = flexmsg.flex(i_2,data_2) #flexmsg需要新增報名情境
+                    line_bot_api.reply_message(
+                        event.reply_token,
+                        msg_2
+                    )               
+                #出現summary
+                elif None not in data_2:
+                    msg_2 = flexmsg.sumerary(data_2)
+                    line_bot_api.reply_message(
+                        event.reply_token,
+                        msg_2
+                    )
+                    
+        else:
+            if event.message.text == '確認報名':
+                #找到他報的團的編號activity_no
+                postgres_select_query = f"""SELECT activity_no FROM registration_data WHERE condition = 'initial' AND user_id = '{event.source.user_id}';"""
+                cursor.execute(postgres_select_query)
+                activity_no = cursor.fetchone()[0]
+
+                #找報該團現在的報名人數attendee並更新(+1)
+                postgres_select_query = f"""SELECT attendee FROM group_data WHERE activity_no = {activity_no};"""
+                cursor.execute(postgres_select_query)
+                attendee = cursor.fetchone()[0]
+                attendee += 1 
+                
+                #將更新的報名人數attendent記錄到報名表單group_data裡
+                postgres_update_query = f"""UPDATE group_data SET attendee = {attendee} WHERE activity_no = {activity_no};"""
+                cursor.execute(postgres_update_query)
+                conn.commit()
+                
+                #檢查報名人數attendee是否達上限people
+                postgres_select_query = f"""SELECT people FROM group_data WHERE activity_no = {activity_no};"""
+                cursor.execute(postgres_select_query)
+                people = cursor.fetchone()[0]
+                    
+                if attendee == people:
+                    postgres_update_query = f"""UPDATE group_data SET condition = 'closed' WHERE activity_no = {activity_no};"""
+                    cursor.execute(postgres_update_query)
+                    conn.commit()
+
+                        
+                #將報名表單的condition改成closed
+                postgres_update_query = f"""UPDATE registration_data SET condition = 'closed' WHERE condition = 'initial' AND user_id = '{event.source.user_id}';"""
+                cursor.execute(postgres_update_query)
+                conn.commit()
+                
+                line_bot_api.reply_message(
+                    event.reply_token,
+                    TextSendMessage(text="finish!!")
+                )
+                    
+                cursor.close()
+                conn.close()
