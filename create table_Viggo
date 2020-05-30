@@ -34,7 +34,7 @@ conn.commit()
 #創報名表單 registration_data
 create_table =  '''CREATE TABLE registration_data(
            record_no serial PRIMARY KEY,
-           group_name VARCHAR (50),
+           activity_name VARCHAR (50),
            attendee VARCHAR (50),
            phone VARCHAR (50),
            mail VARCHAR (50),
