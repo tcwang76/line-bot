@@ -674,7 +674,7 @@ def summary(data):
                             label = "取消開團",
                             text = "取消"
                         )
-                    )
+                    ))
                 ]
             )
         )
