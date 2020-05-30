@@ -667,14 +667,15 @@ def summary(data):
                         action = MessageAction(
                             label = "確認開團",
                             text = "確認開團"
-                        ),
+                        )
+                    ),
                     ButtonComponent(
                         style = "primary",
                         action = MessageAction(
                             label = "取消開團",
                             text = "取消"
                         )
-                    ))
+                    )
                 ]
             )
         )
