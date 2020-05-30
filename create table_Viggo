@@ -2,11 +2,10 @@ import os
 import psycopg2
 
 DATABASE_URL = os.popen('heroku config:get DATABASE_URL -a shao-haha').read()[:-1]
-
 conn = psycopg2.connect(DATABASE_URL, sslmode='require')
-
 cursor = conn.cursor()
 
+#創開團表單 group_data
 create_table =  '''CREATE TABLE group_data(
            record_no serial PRIMARY KEY,
            activity_type VARCHAR (50),
@@ -29,10 +28,23 @@ create_table =  '''CREATE TABLE group_data(
            user_id VARCHAR (50)
         );'''
 
+cursor.execute(create_table)
+conn.commit()
+
+#創報名表單 registration_data
+create_table =  '''CREATE TABLE registration_data(
+           record_no serial PRIMARY KEY,
+           group_name VARCHAR (50),
+           name VARCHAR (50),
+           phone VARCHAR (50),
+           mail VARCHAR (50),
+           condition VARCHAR (50),
+           user_id VARCHAR (50)
+        );'''
 
 cursor.execute(create_table)
-
 conn.commit()
+
 
 cursor.close()
 conn.close()
