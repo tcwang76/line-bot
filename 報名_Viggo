@@ -1,19 +1,17 @@
-DATABASE_URL = os.popen('heroku config:get DATABASE_URL -a shao-haha').read()[:-1]
-#DATABASE_URL = os.environ['DATABASE_URL']
-conn = psycopg2.connect(DATABASE_URL, sslmode='require')
-cursor = conn.cursor()
-
-if event.message.text == "~join":
+# 跟"if event.message.text == "~open":"同階層
+elif event.message.text == "~join":
     #~~~這裡跳出quick reply按鈕~~~
-       
-else:
+    
+else: #這個else等同第84行的else
+    #以下接在第84行之後
     postgres_select_query = f"""SELECT * FROM registration_data WHERE condition = 'initial' AND user_id = '{event.source.user_id}';"""
     cursor.execute(postgres_select_query)
     data_2 = cursor.fetchone() #準備寫入報名資料的那一列
     column_all_registration = ['record_no', 'activity_number', 'activity_name', 'name', 'phone', 'mail', 'condition', 'user_id']
     activity_type = ['登山踏青', '桌遊麻將', '吃吃喝喝', '唱歌跳舞']
     
-    if event.message.text in activity_type:         
+    #以下跟第94行的"if data:"同階層
+    elif event.message.text in activity_type: #這裡的event.message.text會是上面quick reply回傳的訊息(四種type其中一種)        
         pass #~~跳出該type的carousel
     
     elif event.message.text == "了解更多":
@@ -47,7 +45,7 @@ else:
         
             record = event.message.text
             
-            #如果使用者輸入的電話重複
+            #當進行到輸入電話時(i_2==4)，開始檢驗是否重複
             if i_2 == 4:
                 postgres_select_query = f"""SELECT activity_no FROM registration_data WHERE condition = 'initial' AND user_id = '{event.source.user_id}';"""
                 cursor.execute(postgres_select_query)
@@ -66,9 +64,10 @@ else:
                 
                         line_bot_api.reply_message(
                             event.reply_token,
-                            TextSendMessage(text="can not use same phone number")
+                            TextSendMessage(text="不可重複報名")
                         )
-                    #~~~出現[返回]按鈕，重新回到報名第一步(按鈕回傳~join)
+                        #~~~這邊感覺可以設計一個flex_msg，出現[返回]按鈕，重新回到報名第一步(按鈕回傳~join)
+                    
                     else:
                         postgres_update_query = f"""UPDATE registration_data SET {column_all_registration[i_2]} = '{record}' WHERE condition = 'initial' AND user_id = '{event.source.user_id}';"""
                         cursor.execute(postgres_update_query)
@@ -88,7 +87,8 @@ else:
                 postgres_select_query = f"""SELECT * FROM registration_data WHERE condition = 'initial' AND user_id = '{event.source.user_id}';"""
                 cursor.execute(postgres_select_query)
                 data_2 = cursor.fetchone() #準備寫入報名資料的那一列    
-                if None in data_2:
+               
+               if None in data_2:
                     msg_2 = flexmsg.flex(i_2,data_2) #flexmsg需要新增報名情境
                     line_bot_api.reply_message(
                         event.reply_token,
