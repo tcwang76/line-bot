@@ -687,6 +687,102 @@ def summary(data):
     )
     return sumer
 
+#尚需加入活動index bubble
+def carousel(data): 
+    bubbles = []
+    if data:
+        for row in data:
+            temp = BubbleContainer(
+                        size = "kilo",
+                        direction = "ltr", 
+                        hero = ImageComponent(
+                            size = "full",
+                            aspectMode = "cover",
+                            aspectRatio = "320:213",
+                            url = "https://scdn.line-apps.com/n/channel_devcenter/img/flexsnapshot/clip/clip11.jpg"
+                            ),
+                        body = BoxComponent(
+                            layout = "vertical",
+                            contents = [
+                                TextComponent(
+                                    text = f"{row[2]}",
+                                    weight = "bold",
+                                    size = "md",
+                                    wrap = True
+                                    ),
+                                BoxComponent(
+                                    layout = "vertical",
+                                    contents = [
+                                        BoxComponent(
+                                            layout = "vertical",
+                                            spacing = "sm",
+                                            contents = [
+                                                TextComponent(
+                                                    text = f"地點 {row[5]}",
+                                                    wrap = True,
+                                                    color = "#8c8c8c",
+                                                    size = "xs",
+                                                    flex = 5,
+                                                    ),
+                                                TextComponent(
+                                                    text = f"時間 {row[3]}",
+                                                    color = "#8c8c8c",
+                                                    size = "xs",
+                                                    ),
+                                                TextComponent(
+                                                    text = f"費用 {row[9]}",
+                                                    color = "#8c8c8c",
+                                                    size = "xs",
+                                                    ),
+                                                ]
+                                            )
+                                        ]
+                                    )
+                                ],
+                            paddingAll = "13px",
+                            spacing = "md",
+                            ),
+                        footer = BoxComponent(
+                            layout = "horizontal",
+                            contents = [
+                                ButtonComponent(
+                                    style = "link",
+                                    action = MessageAction(
+                                        label = "我要報名",
+                                        text = f"我要報名{row[2]}"
+                                        ),
+                                    height = "sm",
+                                    margin = "none",
+                                    gravity = "center"
+                                    ),
+                                ButtonComponent(
+                                    style = "link",
+                                    action = MessageAction(
+                                        label = "詳細資訊",
+                                        text = "{row[2]}詳細資訊"
+                                        ),
+                                    height = "sm",
+                                    margin = "none",
+                                    gravity = "center"
+                                    )
+                                ],
+                            action = MessageAction(
+                                label = "活動1",
+                                text = f"row[2]"
+                                )
+                            )
+                        )
+            bubbles.append(temp)
+            if len(bubbles) > 8:
+                break
+    msg_carousel = FlexSendMessage(
+        alt_text = "可報名活動",
+        contents = CarouselContainer(
+            contents = bubbles
+            )
+        )
+    return msg_carousel
+
 # #請把Flexmessage集中在這邊
 
 # #活動類型（選單）(by Tina)
