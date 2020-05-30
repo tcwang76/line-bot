@@ -15,7 +15,7 @@ create_table =  '''CREATE TABLE group_data(
            location_tittle VARCHAR (50),
            lat NUMERIC (9, 6) ,
            long NUMERIC (9, 6),
-           people INTEGER (50),
+           people INTEGER ,
            cost INTEGER ,
            due_date DATE ,
            description TEXT,
@@ -34,7 +34,7 @@ conn.commit()
 #創報名表單 registration_data
 create_table =  '''CREATE TABLE registration_data(
            record_no serial PRIMARY KEY,
-           activity_no VARCHAR (50),
+           activity_no INTEGER,
            activity_name VARCHAR (50),
            attendee_name VARCHAR (50),
            phone VARCHAR (50),
