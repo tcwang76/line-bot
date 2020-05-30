@@ -660,7 +660,7 @@ def summary(data):
                 ]
             ),
             footer = BoxComponent(
-                layout = "vertical",
+                layout = "horizontal",
                 contents = [
                     ButtonComponent(
                         style = "link",
