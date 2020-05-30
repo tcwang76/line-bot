@@ -20,9 +20,9 @@ create_table =  '''CREATE TABLE group_data(
            due_date DATE ,
            description TEXT,
            photo TEXT,
-           your_name VARCHAR (50),
-           your_phone VARCHAR (10),
-           your_mail VARCHAR (50),
+           name VARCHAR (50),
+           phone VARCHAR (10),
+           mail VARCHAR (50),
            attendent INTEGER ,
            condition VARCHAR (50),
            user_id VARCHAR (50)
@@ -35,7 +35,7 @@ conn.commit()
 create_table =  '''CREATE TABLE registration_data(
            record_no serial PRIMARY KEY,
            group_name VARCHAR (50),
-           name VARCHAR (50),
+           attendee VARCHAR (50),
            phone VARCHAR (50),
            mail VARCHAR (50),
            condition VARCHAR (50),
