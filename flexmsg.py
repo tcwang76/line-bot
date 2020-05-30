@@ -289,7 +289,7 @@ mail=FlexSendMessage(
         )
     )
 )
-def sumerary(data):
+def summary(data):
     sumer = FlexSendMessage(
         alt_text = "請確認開團資訊",
         contents = BubbleContainer(
@@ -667,6 +667,12 @@ def sumerary(data):
                         action = MessageAction(
                             label = "確認開團",
                             text = "確認開團"
+                        ),
+                    ButtonComponent(
+                        style = "primary",
+                        action = MessageAction(
+                            label = "取消開團",
+                            text = "取消"
                         )
                     )
                 ]
@@ -1074,3 +1080,6 @@ def sumerary(data):
 
 
 # #報名Summary
+
+
+
