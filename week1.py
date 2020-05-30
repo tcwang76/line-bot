@@ -69,7 +69,7 @@ def echo(event):
             conn.close()
 
         #中途想結束輸入~delete, 把initial那列刪除
-        elif event.message.text == "~delete":
+        elif event.message.text == "取消":
             line_bot_api.reply_message(
                 event.reply_token,
                 TextSendMessage(text='取消成功')
@@ -95,7 +95,7 @@ def echo(event):
                 
                 if None in data:
                     i = data.index(None)
-                    
+                    print("i= ",i)
                     record = event.message.text
                     #如果使用者輸入的資料不符合資料庫的資料型態, 則輸入N/A
                     if event.message.type == 'text':
@@ -124,7 +124,7 @@ def echo(event):
                         postgres_select_query = f"""SELECT * FROM group_data ORDER BY record_no DESC;"""
                         cursor.execute(postgres_select_query)
                         data = cursor.fetchone()
-                        msg=flexmsg.sumerary(data)
+                        msg=flexmsg.summary(data)
                         line_bot_api.reply_message(
                             event.reply_token,
                             msg
@@ -152,7 +152,7 @@ def echo(event):
                             postgres_update_query = f"""UPDATE group_data SET location_tittle = Null WHERE condition = 'initial' AND user_id = '{event.source.user_id}';"""
                             cursor.execute(postgres_update_query)
                             conn.commit()
-                            msg=flexmsg.flex(column)
+                            msg=flexmsg.flex(column,data)
                             line_bot_api.reply_message(
                                 event.reply_token,
                                 msg
@@ -172,12 +172,13 @@ def echo(event):
                                 TextSendMessage(text= 'please enter the column you want to edit')
                             )
 
+            
             else:
 
                 if event.message.text.encode == "double":
                     line_bot_api.reply_message(
                         event.reply_token,
-                        flexmsg.sumerary
+                        flexmsg.summary(data)
                     )
 
                 elif event.message.text == "早安":
@@ -229,7 +230,7 @@ def gathering(event):
             postgres_select_query = f"""SELECT * FROM group_data ORDER BY record_no DESC;"""
             cursor.execute(postgres_select_query)
             data = cursor.fetchone()
-            msg=flexmsg.sumerary(data)
+            msg=flexmsg.summary(data)
             line_bot_api.reply_message(
                 event.reply_token,
                 msg
@@ -255,7 +256,7 @@ def gathering(event):
             postgres_select_query = f"""SELECT * FROM group_data ORDER BY record_no DESC;"""
             cursor.execute(postgres_select_query)
             data = cursor.fetchone()
-            msg=flexmsg.sumerary(data)
+            msg=flexmsg.summary(data)
             line_bot_api.reply_message(
                 event.reply_token,
                 msg
@@ -295,7 +296,7 @@ def gathering(event):
         postgres_select_query = f"""SELECT * FROM group_data ORDER BY record_no DESC;"""
         cursor.execute(postgres_select_query)
         data = cursor.fetchone()
-        msg=flexmsg.sumerary(data)
+        msg=flexmsg.summary(data)
         line_bot_api.reply_message(
             event.reply_token,
             msg
