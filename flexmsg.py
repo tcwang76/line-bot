@@ -13,35 +13,35 @@ def extend(j):
 
 # 給開團者用的
 def flex(i,date):
-    if i == 1 or i =="activity_name":
-        msg=activity_name
-    elif i == 2 or i =="activity_time":
-        msg=activity_time
-    elif i == 3 or i =="location":
+    if i == 1 or i == "activity_name":
+        msg = activity_name
+    elif i == 2 or i == "activity_time":
+        msg = activity_time
+    elif i == 3 or i == "location":
         msg=location
-    elif i == 5 or i=="people":
-        msg=people
+    elif i == 5 or i == "people":
+        msg = people
     elif i == 8 or i == "cost":
-        msg=cost
+        msg = cost
     elif i == 9 or i == "due_date":
-        msg=due_time(date)
+        msg = due_time(date)
     elif i == 10 or i == "description":
-        msg=description
+        msg = description
     elif i == 11 or i == "photo":
-        msg=photo
+        msg = photo
     elif i == 12 or i == "your_name":
-        msg=name
-    elif i == 13 or i =="your_phone":
-        msg=phone
+        msg = name
+    elif i == 13 or i == "your_phone":
+        msg = phone
     elif i == 14 or i == "your_mail":
-        msg=mail
+        msg = mail
     elif i == "activity_type":
-        msg=activity_type
+        msg = activity_type
     else:
-        msg="try again"
+        msg = "try again"
     return msg
 
-activity_type=TextSendMessage(
+activity_type = TextSendMessage(
     text = "請選擇您的活動類型",
     quick_reply = QuickReply(
         items = [
@@ -59,7 +59,7 @@ activity_type=TextSendMessage(
                 )
             ]))
 
-activity_name=FlexSendMessage(
+activity_name = FlexSendMessage(
     alt_text = "請填寫活動名稱", 
     contents = BubbleContainer(
         direction = "ltr",
@@ -76,29 +76,29 @@ activity_name=FlexSendMessage(
             ]
         )))
 
-activity_time=FlexSendMessage(
+activity_time = FlexSendMessage(
     alt_text = "請挑選活動時間", 
     contents = BubbleContainer(
-        direction= "ltr",
-        body=BoxComponent(
-          layout= "vertical",
-          contents=[
+        direction = "ltr",
+        body = BoxComponent(
+          layout = "vertical",
+          contents =[
           TextComponent(
-              text="請選擇活動時間",
-              size= "lg",
-              align= "center",
-              weight= "bold"
+              text = "請選擇活動時間",
+              size = "lg",
+              align = "center",
+              weight = "bold"
               )
           ]
         ),
-        footer=BoxComponent(
-          layout= "horizontal",
-          contents= [
+        footer = BoxComponent(
+          layout = "horizontal",
+          contents = [
             ButtonComponent(
               DatetimePickerAction(
-                label= "點我選時間",
-                data="Activity_time",
-                mode= "datetime"
+                label = "點我選時間",
+                data = "Activity_time",
+                mode = "datetime"
               )
             )
           ]
@@ -106,28 +106,28 @@ activity_time=FlexSendMessage(
     )
 )
 
-location=FlexSendMessage(
+location = FlexSendMessage(
     alt_text = "請挑選活動地點", 
     contents = BubbleContainer(
-        direction= "ltr",
-        body=BoxComponent(
-          layout= "vertical",
-          contents=[
+        direction = "ltr",
+        body = BoxComponent(
+          layout = "vertical",
+          contents = [
           TextComponent(
-              text="請選擇活動地點",
-              size= "lg",
-              align= "center",
-              weight= "bold"
+              text = "請選擇活動地點",
+              size = "lg",
+              align = "center",
+              weight = "bold"
               )
           ]
         ),
-        footer=BoxComponent(
-          layout= "horizontal",
-          contents= [
+        footer = BoxComponent(
+          layout = "horizontal",
+          contents = [
             ButtonComponent(
               URIAction(
-                label= "點我選地點",
-                uri= "https://line.me/R/nv/location"
+                label = "點我選地點",
+                uri = "https://line.me/R/nv/location"
               )
             )
           ]
@@ -135,36 +135,36 @@ location=FlexSendMessage(
     )
 )
 
-people=FlexSendMessage(
+people = FlexSendMessage(
     alt_text = "請填寫人數", 
     contents = BubbleContainer(
-        direction= "ltr",
-        body=BoxComponent(
-          layout= "vertical",
-          contents=[
+        direction = "ltr",
+        body = BoxComponent(
+          layout = "vertical",
+          contents =[
           TextComponent(
-              text="請填寫活動參加人數",
-              size= "lg",
-              align= "center",
-              weight= "bold"
+              text = "請填寫活動參加人數",
+              size = "lg",
+              align = "center",
+              weight = "bold"
               )
           ]
         )
     )
 )
 
-cost=FlexSendMessage(
+cost = FlexSendMessage(
     alt_text = "請填寫預計支出", 
-    contents =BubbleContainer(
-        direction= "ltr",
-        body=BoxComponent(
-          layout= "vertical",
-          contents=[
+    contents = BubbleContainer(
+        direction = "ltr",
+        body = BoxComponent(
+          layout = "vertical",
+          contents = [
           TextComponent(
-              text="請填寫預計支出",
-              size= "lg",
-              align= "center",
-              weight= "bold"
+              text = "請填寫預計支出",
+              size = "lg",
+              align = "center",
+              weight = "bold"
               )
           ]
         )
@@ -172,29 +172,29 @@ cost=FlexSendMessage(
 )
 
 def due_time(date):
-    due=FlexSendMessage(
+    due = FlexSendMessage(
         alt_text = "請挑選截止日期", 
         contents = BubbleContainer(
-            direction= "ltr",
-            body=BoxComponent(
-              layout= "vertical",
-              contents=[
+            direction = "ltr",
+            body = BoxComponent(
+              layout = "vertical",
+              contents = [
               TextComponent(
-                  text="請選擇報名截止日期",
-                  size= "lg",
-                  align= "center",
-                  weight= "bold"
+                  text = "請選擇報名截止日期",
+                  size = "lg",
+                  align = "center",
+                  weight = "bold"
                   )
               ]
             ),
-            footer=BoxComponent(
-                layout= "horizontal",
-                contents= [ButtonComponent(
+            footer = BoxComponent(
+                layout = "horizontal",
+                contents = [ButtonComponent(
                     DatetimePickerAction(
-                        label= "點我選時間",
-                        data="Due_time",
-                        mode= "date",
-                        max= str(date[3])
+                        label = "點我選時間",
+                        data = "Due_time",
+                        mode = "date",
+                        max = str(date[3])
                     )
                 )
               ]
@@ -203,92 +203,92 @@ def due_time(date):
     )
     return due
 
-description=FlexSendMessage(
+description = FlexSendMessage(
     alt_text = "請填寫活動內容", 
     contents = BubbleContainer(
-        direction= "ltr",
-        body=BoxComponent(
-          layout= "vertical",
-          contents=[
+        direction = "ltr",
+        body = BoxComponent(
+          layout = "vertical",
+          contents = [
           TextComponent(
-              text="請填寫詳細活動內容",
-              size= "lg",
-              align= "center",
-              weight= "bold"
+              text = "請填寫詳細活動內容",
+              size = "lg",
+              align = "center",
+              weight = "bold"
               )
           ]
         )
     )
 )
 
-photo=FlexSendMessage(
+photo = FlexSendMessage(
     alt_text = "請提供照片網址", 
-    contents =BubbleContainer(
-        direction= "ltr",
-        body=BoxComponent(
-          layout= "vertical",
-          contents=[
+    contents = BubbleContainer(
+        direction = "ltr",
+        body = BoxComponent(
+          layout = "vertical",
+          contents = [
           TextComponent(
-              text="請提供照片網址，若無網址請先上傳至網路平台（imgurl...等）",
-              size= "md",
-              wrap=True,
-              align= "center",
-              weight= "bold"
+              text = "請提供照片網址，若無網址請先上傳至網路平台（imgurl...等）",
+              size = "md",
+              wrap = True,
+              align = "center",
+              weight = "bold"
               )
           ]
         )
     )
 )
 
-name=FlexSendMessage(
+name = FlexSendMessage(
     alt_text = "請提供名稱", 
     contents = BubbleContainer(
-        direction= "ltr",
-        body=BoxComponent(
-          layout= "vertical",
-          contents=[
+        direction = "ltr",
+        body = BoxComponent(
+          layout = "vertical",
+          contents = [
           TextComponent(
-              text="請提供您的姓名或是可以辨識之暱稱",
-              size= "md",
-              wrap=True,
-              align= "center",
-              weight= "bold"
+              text = "請提供您的姓名或是可以辨識之暱稱",
+              size = "md",
+              wrap = True,
+              align = "center",
+              weight = "bold"
               )
           ]
         )
     )
 )
 
-phone=FlexSendMessage(
+phone = FlexSendMessage(
     alt_text = "請提供電話", 
     contents = BubbleContainer(
-        direction= "ltr",
-        body=BoxComponent(
-          layout= "vertical",
-          contents=[
+        direction = "ltr",
+        body = BoxComponent(
+          layout = "vertical",
+          contents = [
           TextComponent(
-              text="請提供可以聯絡您的電話號碼",
-              size= "lg",
-              align= "center",
-              weight= "bold"
+              text = "請提供可以聯絡您的電話號碼",
+              size = "lg",
+              align = "center",
+              weight = "bold"
               )
           ]
         )
     )
 )
 
-mail=FlexSendMessage(
+mail = FlexSendMessage(
     alt_text = "請提供信箱", 
     contents = BubbleContainer(
-        direction= "ltr",
-        body=BoxComponent(
-          layout= "vertical",
-          contents=[
+        direction = "ltr",
+        body = BoxComponent(
+          layout = "vertical",
+          contents = [
           TextComponent(
-              text="請提供可以聯絡您的電子信箱",
-              size= "lg",
-              align= "center",
-              weight= "bold"
+              text = "請提供可以聯絡您的電子信箱",
+              size = "lg",
+              align = "center",
+              weight = "bold"
               )
           ]
         )
@@ -320,11 +320,11 @@ def summary(data):
                             TextComponent(
                                 text = f"活動類型：{data[1]}",
                                 size = "md",
-                                flex=10,
+                                flex = 10,
                                 align = "start"
                             ),
                             SeparatorComponent(
-                                margin="lg"
+                                margin = "lg"
                             )
                         ]
                     ),
@@ -335,9 +335,9 @@ def summary(data):
                                 text = "修改",
                                 size = "md",
                                 align = "end",
-                                gravity="top",
-                                weight="bold",
-                                action=MessageAction(
+                                gravity = "top",
+                                weight = "bold",
+                                action = MessageAction(
                                     text = "activity_type"
                                 )
                             )
@@ -349,11 +349,11 @@ def summary(data):
                             TextComponent(
                                 text = f"活動名稱：{data[2]}",
                                 size = "md",
-                                flex=10,
+                                flex = 10,
                                 align = "start"
                             ),
                             SeparatorComponent(
-                                margin="lg"
+                                margin = "lg"
                             )
                         ]
                     ),
@@ -364,8 +364,8 @@ def summary(data):
                                 text = "修改",
                                 size = "md",
                                 align = "end",
-                                gravity="top",
-                                weight="bold",
+                                gravity = "top",
+                                weight = "bold",
                                 action = MessageAction(
                                     text = "activity_name"
                                 )
@@ -378,11 +378,11 @@ def summary(data):
                             TextComponent(
                                 text = f"活動時間：{data[3]} {data[4]}",
                                 size = "md",
-                                flex=10,
+                                flex = 10,
                                 align = "start"
                             ),
                             SeparatorComponent(
-                                margin="lg"
+                                margin = "lg"
                             )
                         ]
                     ),BoxComponent(
@@ -392,8 +392,8 @@ def summary(data):
                                 text = "修改",
                                 size = "md",
                                 align = "end",
-                                gravity="top",
-                                weight="bold",
+                                gravity = "top",
+                                weight = "bold",
                                 action = MessageAction(
                                     text = "activity_date"
                                 )
@@ -406,12 +406,12 @@ def summary(data):
                             TextComponent(
                                 text = f"活動地點：{data[5]}",
                                 size = "md",
-                                flex=10,
-                                wrap=True,
+                                flex = 10,
+                                wrap = True,
                                 align = "start"
                             ),
                             SeparatorComponent(
-                                margin="lg"
+                                margin = "lg"
                             )
                         ]
                     ),
@@ -422,8 +422,8 @@ def summary(data):
                                 text = "修改",
                                 size = "md",
                                 align = "end",
-                                gravity="top",
-                                weight="bold",
+                                gravity = "top",
+                                weight = "bold",
                                 action = MessageAction(
                                     text = "location"
                                 )
@@ -436,11 +436,11 @@ def summary(data):
                             TextComponent(
                                 text = f"活動人數：{data[8]}",
                                 size = "md",
-                                flex=10,
+                                flex = 10,
                                 align = "start"
                             ),
                             SeparatorComponent(
-                                margin="lg"
+                                margin = "lg"
                             )
                         ]
                     ),
@@ -451,8 +451,8 @@ def summary(data):
                                 text = "修改",
                                 size = "md",
                                 align = "end",
-                                gravity="top",
-                                weight="bold",
+                                gravity = "top",
+                                weight = "bold",
                                 action = MessageAction(
                                     text = "people"
                                 )
@@ -465,11 +465,11 @@ def summary(data):
                             TextComponent(
                                 text = f"活動費用：{data[9]}",
                                 size = "md",
-                                flex=10,
+                                flex = 10,
                                 align = "start"
                             ),
                             SeparatorComponent(
-                                margin="lg"
+                                margin = "lg"
                             )
                         ]
                     ),
@@ -480,8 +480,8 @@ def summary(data):
                                 text = "修改",
                                 size = "md",
                                 align = "end",
-                                gravity="top",
-                                weight="bold",
+                                gravity = "top",
+                                weight = "bold",
                                 action = MessageAction(
                                     text = "cost"
                                 )
@@ -494,11 +494,11 @@ def summary(data):
                             TextComponent(
                                 text = f"報名截止日：{data[10]}",
                                 size = "md",
-                                flex=10,
+                                flex = 10,
                                 align = "start"
                             ),
                             SeparatorComponent(
-                                margin="lg"
+                                margin = "lg"
                             )
                         ]
                     ),
@@ -509,8 +509,8 @@ def summary(data):
                                 text = "修改",
                                 size = "md",
                                 align = "end",
-                                gravity="top",
-                                weight="bold",
+                                gravity = "top",
+                                weight = "bold",
                                 action = MessageAction(
                                     text = "due_date"
                                 )
@@ -523,11 +523,11 @@ def summary(data):
                             TextComponent(
                                 text = f"活動敘述：{data[11]}",
                                 size = "md",
-                                flex=10,
+                                flex = 10,
                                 align = "start"
                             ),
                             SeparatorComponent(
-                                margin="lg"
+                                margin = "lg"
                             )
                         ]
                     ),
@@ -538,8 +538,8 @@ def summary(data):
                                 text = "修改",
                                 size = "md",
                                 align = "end",
-                                gravity="top",
-                                weight="bold",
+                                gravity = "top",
+                                weight = "bold",
                                 action = MessageAction(
                                     text = "description"
                                 )
@@ -552,11 +552,11 @@ def summary(data):
                             TextComponent(
                                 text = f"活動照片：{data[12]}",
                                 size = "md",
-                                flex=10,
+                                flex = 10,
                                 align = "start"
                             ),
                             SeparatorComponent(
-                                margin="lg"
+                                margin = "lg"
                             )
                         ]
                     ),
@@ -567,8 +567,8 @@ def summary(data):
                                 text = "修改",
                                 size = "md",
                                 align = "end",
-                                gravity="top",
-                                weight="bold",
+                                gravity = "top",
+                                weight = "bold",
                                 action = MessageAction(
                                     text = "photo"
                                 )
@@ -581,11 +581,11 @@ def summary(data):
                             TextComponent(
                                 text = f"主揪姓名：{data[13]}",
                                 size = "md",
-                                flex=10,
+                                flex = 10,
                                 align = "start"
                             ),
                             SeparatorComponent(
-                                margin="lg"
+                                margin = "lg"
                             )
                         ]
                     ), 
@@ -596,8 +596,8 @@ def summary(data):
                                 text = "修改",
                                 size = "md",
                                 align = "end",
-                                gravity="top",
-                                weight="bold",
+                                gravity = "top",
+                                weight = "bold",
                                 action = MessageAction(
                                     text = "your_name"
                                 )
@@ -610,11 +610,11 @@ def summary(data):
                             TextComponent(
                                 text = f"主揪電話：{data[14]}",
                                 size = "md",
-                                flex=10,
+                                flex = 10,
                                 align = "start"
                             ),
                             SeparatorComponent(
-                                margin="lg"
+                                margin = "lg"
                             )
                         ]
                     ),
@@ -625,8 +625,8 @@ def summary(data):
                                 text = "修改",
                                 size = "md",
                                 align = "end",
-                                gravity="top",
-                                weight="bold",
+                                gravity = "top",
+                                weight = "bold",
                                 action = MessageAction(
                                     text = "your_phone"
                                 )
@@ -639,11 +639,11 @@ def summary(data):
                             TextComponent(
                                 text = f"主揪email：{data[15]}",
                                 size = "md",
-                                flex=10,
+                                flex = 10,
                                 align = "start"
                             ),
                             SeparatorComponent(
-                                margin="lg"
+                                margin = "lg"
                             )
                         ]
                     ),
@@ -654,8 +654,8 @@ def summary(data):
                                 text = "修改",
                                 size = "md",
                                 align = "end",
-                                gravity="top",
-                                weight="bold",
+                                gravity = "top",
+                                weight = "bold",
                                 action = MessageAction(
                                     text = "your_mail"
                                 )
@@ -794,7 +794,7 @@ def MoreInfoSummary(data):
                             TextComponent(
                                 text = f"活動敘述：{data[11]}",
                                 size = "md",
-                                flex=10,
+                                flex = 10,
                                 align = "start"
                             )
                         ]
