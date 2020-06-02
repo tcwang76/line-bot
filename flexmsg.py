@@ -5,11 +5,12 @@ from linebot.models import (
     CarouselTemplate, CarouselColumn, PostbackEvent,
     FlexSendMessage, BubbleContainer, ImageComponent, BoxComponent,
     TextComponent, SpacerComponent, IconComponent, ButtonComponent,
-    SeparatorComponent, QuickReply, QuickReplyButton
+    SeparatorComponent, QuickReply, QuickReplyButton,CarouselContainer
 )
+import datetime as dt
 # 給報名者用的
-def extend(j):
-    return flex(j+10)
+def extend(j,date):
+    return flex(j+10,date)
 
 # 給開團者用的
 def flex(i,date):
@@ -717,7 +718,6 @@ def MoreInfoSummary(data):
                                 size = "md",
                                 flex = 10,
                                 align = "start",
-                                margin = "
                             )
                         ]
                     ),
@@ -842,8 +842,95 @@ def MoreInfoSummary(data):
 
 #尚需加入活動index bubble
 def carousel(data): 
-    bubbles = []
+
     if data:
+        tem=[]
+        for row in data:
+            te=BoxComponent(
+                layout = "horizontal",
+                contents = [
+                    BoxComponent(
+                        layout = "horizontal",
+                        flex =  1,
+                        contents = [ 
+                            BoxComponent(
+                                layout =  "baseline",
+                                flex =  1,
+                                contents = [ 
+                                    IconComponent(
+                                        url =  "https://scdn.line-apps.com/n/channel_devcenter/img/fx/review_gold_star_28.png",
+                                        size =  "md"
+                                    )
+                                ]
+                            )
+                        ]
+                    ),
+                    BoxComponent(
+                        layout = "horizontal",
+                        flex =  9,
+                        contents = [ 
+                            TextComponent(
+                                text =  f"{row[2]}",
+                                align =  "start",
+                                weight =  "bold"
+                            ),
+                            TextComponent(
+                                text =  "詳細資訊",
+                                align =  "end",
+                                action = PostbackAction(
+                                    data =  f"detail {row[0]}"
+                                )
+                            )
+                        ]
+                    )
+                ]
+            )
+            tem.append(te)
+            if len(tem)>7:
+                break
+        index=BubbleContainer(
+            size = "kilo",
+            direction = "ltr",
+            header = BoxComponent(
+            layout = "horizontal",
+            contents = [ 
+                TextComponent(
+                    text =  "揪團列表",
+                    size =  "lg",
+                    weight =  "bold",
+                    color =  "#AAAAAA"
+                )
+            ]
+            ),
+            body = BoxComponent(
+                layout = "vertical",
+                spacing =  "md",
+                contents = tem
+            ),
+            footer=BoxComponent(
+                layout = "horizontal",
+                contents = [ 
+                    ButtonComponent(
+                        action = PostbackAction(
+                            label =  "上一頁",
+                            data =  "backward"
+                        ),
+                        height = "sm",
+                        style = "link"
+                    ),
+                    SeparatorComponent(
+                    ),
+                    ButtonComponent(          
+                        action = PostbackAction(
+                        label = "下一頁",
+                        data =  "forward"
+                        ),
+                        height = "sm"
+                    )
+                ]
+            )
+        )
+        bubbles = [index]
         for row in data:
             temp = BubbleContainer(
                         size = "kilo",
@@ -871,19 +958,19 @@ def carousel(data):
                                             spacing = "sm",
                                             contents = [
                                                 TextComponent(
-                                                    text = f"地點 {row[5]}",
+                                                    text = f"地點: {row[5]}",
                                                     wrap = True,
                                                     color = "#8c8c8c",
                                                     size = "xs",
                                                     flex = 5,
                                                     ),
                                                 TextComponent(
-                                                    text = f"時間 {row[3]}",
+                                                    text = f"時間: {row[3]}",
                                                     color = "#8c8c8c",
                                                     size = "xs",
                                                     ),
                                                 TextComponent(
-                                                    text = f"費用 {row[9]}",
+                                                    text = f"費用: {row[9]}",
                                                     color = "#8c8c8c",
                                                     size = "xs",
                                                     ),
@@ -902,7 +989,7 @@ def carousel(data):
                                     style = "link",
                                     action = MessageAction(
                                         label = "立即報名",
-                                        text = f"立即報名{row[2]}"
+                                        text = f"立即報名 {row[2]}"
                                         ),
                                     height = "sm",
                                     margin = "none",
@@ -912,7 +999,7 @@ def carousel(data):
                                     style = "link",
                                     action = MessageAction(
                                         label = "詳細資訊",
-                                        text = "{row[2]}詳細資訊"
+                                        text = f"{row[2]} 詳細資訊"
                                         ),
                                     height = "sm",
                                     margin = "none",
@@ -926,8 +1013,24 @@ def carousel(data):
                             )
                         )
             bubbles.append(temp)
-            if len(bubbles) > 8:
+            if len(bubbles) > 9:
                 break
+    else:
+        bubbles=BubbleContainer(
+            body = BoxComponent(
+                layout = "vertical",
+                spacing =  "md",
+                contents = [
+                    TextComponent(
+                        text =  "目前無資料",
+                        size =  "lg",
+                        weight =  "bold",
+                        color =  "#AAAAAA"
+                    )
+                ]
+            )
+        )
+    
     msg_carousel = FlexSendMessage(
         alt_text = "可報名活動",
         contents = CarouselContainer(
@@ -1335,6 +1438,4 @@ def carousel(data):
 
 
 # #報名Summary
-
-
 
