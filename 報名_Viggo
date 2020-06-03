@@ -87,15 +87,15 @@ else: #這個else等同第84行的else
                 postgres_select_query = f"""SELECT * FROM registration_data WHERE condition = 'initial' AND user_id = '{event.source.user_id}';"""
                 cursor.execute(postgres_select_query)
                 data_2 = cursor.fetchone() #準備寫入報名資料的那一列    
-               
-               if None in data_2:
+            
+            if None in data_2:
                     msg_2 = flexmsg.flex(i_2,data_2) #flexmsg需要新增報名情境
                     line_bot_api.reply_message(
                         event.reply_token,
                         msg_2
                     )               
-                #出現summary
-                elif None not in data_2:
+            #出現summary
+            elif None not in data_2:
                     msg_2 = flexmsg.sumerary(data_2)
                     line_bot_api.reply_message(
                         event.reply_token,
