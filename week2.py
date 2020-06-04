@@ -20,6 +20,11 @@ config.read('config.ini')
 line_bot_api = LineBotApi(config.get('line-bot', 'channel_access_token'))
 handler = WebhookHandler(config.get('line-bot', 'channel_secret'))
 
+#check upload
+@app.route("/")
+def hello():
+    return "Hello, world!"
+
 # 接收 LINE 的資訊
 @app.route("/callback", methods=['POST'])
 def callback():
@@ -278,11 +283,7 @@ def echo(event):
                                 postgres_update_query = f"""UPDATE registration_data SET {column_all_registration[i_2]} = '{record}' WHERE condition = 'initial' AND user_id = '{event.source.user_id}';"""
                                 cursor.execute(postgres_update_query)
                                 conn.commit()
-                                msg_2 = flexmsg.extend(i_2+1,data_2) #flexmsg需要新增報名情境
-                                line_bot_api.reply_message(
-                                    event.reply_token,
-                                    msg_2
-                                )            
+           
 
                     else:    
                         #如果使用者輸入的資料不符合資料庫的資料型態, 則輸入N/A
@@ -299,19 +300,19 @@ def echo(event):
                         cursor.execute(postgres_select_query)
                         data_2 = cursor.fetchone() #準備寫入報名資料的那一列  
                         print("i_2 = ",i_2)
-                        if None in data_2:
-                            msg_2 = flexmsg.extend(i_2+1,data_2) #flexmsg需要新增報名情境
-                            line_bot_api.reply_message(
-                                event.reply_token,
-                                msg_2
-                            )               
-                        #出現summary
-                        elif None not in data_2:
-                            msg_2 = flexmsg.summary_for_attend(data_2)
-                            line_bot_api.reply_message(
-                                event.reply_token,
-                                msg_2
-                            )
+                    if None in data_2:
+                        msg_2 = flexmsg.extend(i_2+1,data_2) #flexmsg需要新增報名情境
+                        line_bot_api.reply_message(
+                            event.reply_token,
+                            msg_2
+                        )               
+                    #出現summary
+                    elif None not in data_2:
+                        msg_2 = flexmsg.summary_for_attend(data_2)
+                        line_bot_api.reply_message(
+                            event.reply_token,
+                            msg_2
+                        )
 
                 else:
                     if event.message.text == '確認報名':
@@ -354,6 +355,20 @@ def echo(event):
 
                         cursor.close()
                         conn.close()
+                    elif event.message.text in column_all_registration:
+                        postgres_update_query = f"""UPDATE registration_data SET {event.message.text} = Null WHERE condition = 'initial' AND user_id = '{event.source.user_id}';"""
+                        cursor.execute(postgres_update_query)
+                        conn.commit()
+                        msg_2 = flexmsg.extend(event.message.text,data_2) #flexmsg需要新增報名情境
+                        line_bot_api.reply_message(
+                            event.reply_token,
+                            msg_2
+                        ) 
+                    else:
+                        line_bot_api.reply_message(
+                                event.reply_token,
+                                TextSendMessage(text= 'please enter the column you want to edit')
+                            )
             
             
             else:
