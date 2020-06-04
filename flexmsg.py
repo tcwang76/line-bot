@@ -10,7 +10,14 @@ from linebot.models import (
 import datetime as dt
 # 給報名者用的
 def extend(j,date):
-    return flex(j+10,date)
+    if type(j)==str:
+        if j=='attendee_name':
+            j=3
+        elif j=='phone':
+            j=4
+        elif j=='mail':
+            j=5
+    return flex(j+9,date)
 
 # 給開團者用的
 def flex(i,date):
@@ -30,11 +37,11 @@ def flex(i,date):
         msg = description
     elif i == 11 or i == "photo":
         msg = photo
-    elif i == 12 or i == "your_name":
+    elif i == 12 or i == "name":
         msg = name
-    elif i == 13 or i == "your_phone":
+    elif i == 13 or i == "phone":
         msg = phone
-    elif i == 14 or i == "your_mail":
+    elif i == 14 or i == "mail" or i ==15:
         msg = mail
     elif i == "activity_type":
         msg = activity_type
@@ -57,6 +64,23 @@ activity_type = TextSendMessage(
                 ),
             QuickReplyButton(
                 action = MessageAction(label = "唱歌跳舞", text = "唱歌跳舞")
+                )
+            ]))
+activity_type_for_attendee = TextSendMessage(
+    text = "請選擇活動類型",
+    quick_reply = QuickReply(
+        items = [
+            QuickReplyButton(
+                action = PostbackAction(label = "登山踏青", data = "登山踏青",  display_text='登山踏青')
+                ),
+            QuickReplyButton(
+                action = PostbackAction(label = "桌遊麻將", data = "桌遊麻將", display_text = "桌遊麻將")
+                ),
+            QuickReplyButton(
+                action = PostbackAction(label = "吃吃喝喝", data = "吃吃喝喝", display_text = "吃吃喝喝")
+                ),
+            QuickReplyButton(
+                action = PostbackAction(label = "唱歌跳舞", data = "唱歌跳舞", display_text = "唱歌跳舞")
                 )
             ]))
 
@@ -600,7 +624,7 @@ def summary(data):
                                 gravity = "top",
                                 weight = "bold",
                                 action = MessageAction(
-                                    text = "your_name"
+                                    text = "name"
                                 )
                             )
                         ]
@@ -629,7 +653,7 @@ def summary(data):
                                 gravity = "top",
                                 weight = "bold",
                                 action = MessageAction(
-                                    text = "your_phone"
+                                    text = "phone"
                                 )
                             )
                         ]
@@ -658,7 +682,7 @@ def summary(data):
                                 gravity = "top",
                                 weight = "bold",
                                 action = MessageAction(
-                                    text = "your_mail"
+                                    text = "mail"
                                 )
                             )
                         ]
@@ -689,17 +713,16 @@ def summary(data):
     return sumer
 
 
-#詳細資訊summary
-def MoreInfoSummary(data):
+def summary_for_attend(data):
     sumer = FlexSendMessage(
-        alt_text = "詳細活動資訊",
+        alt_text = "請確認報名資訊",
         contents = BubbleContainer(
             direction = "ltr",
             header = BoxComponent(
               layout = "vertical",
               contents = [
               TextComponent(
-                  text = f"{data[2]}\n活動資訊如下：",
+                  text = "請確認報名資訊：",
                   weight = "bold",
                   size = "md",
                   align = "start",
@@ -714,10 +737,13 @@ def MoreInfoSummary(data):
                         layout = "horizontal",
                         contents = [
                             TextComponent(
-                                text = f"活動類型：{data[1]}",
+                                text = f"活動序號：{data[1]}",
                                 size = "md",
                                 flex = 10,
-                                align = "start",
+                                align = "start"
+                            ),
+                            SeparatorComponent(
+                                margin = "lg"
                             )
                         ]
                     ),
@@ -729,6 +755,9 @@ def MoreInfoSummary(data):
                                 size = "md",
                                 flex = 10,
                                 align = "start"
+                            ),
+                            SeparatorComponent(
+                                margin = "lg"
                             )
                         ]
                     ),
@@ -736,10 +765,28 @@ def MoreInfoSummary(data):
                         layout = "horizontal",
                         contents = [
                             TextComponent(
-                                text = f"活動時間：{data[3]} {data[4]}",
+                                text = f"姓名：{data[3]}",
                                 size = "md",
                                 flex = 10,
                                 align = "start"
+                            ),
+                            SeparatorComponent(
+                                margin = "lg"
+                            )
+                        ]
+                    ), 
+                    BoxComponent(
+                        layout = "horizontal",
+                        contents = [
+                            TextComponent(
+                                text = "修改",
+                                size = "md",
+                                align = "end",
+                                gravity = "top",
+                                weight = "bold",
+                                action = MessageAction(
+                                    text = "attendee_name"
+                                )
                             )
                         ]
                     ),
@@ -747,11 +794,13 @@ def MoreInfoSummary(data):
                         layout = "horizontal",
                         contents = [
                             TextComponent(
-                                text = f"活動地點：{data[5]}",
+                                text = f"電話：{data[4]}",
                                 size = "md",
                                 flex = 10,
-                                wrap = True,
                                 align = "start"
+                            ),
+                            SeparatorComponent(
+                                margin = "lg"
                             )
                         ]
                     ),
@@ -759,10 +808,14 @@ def MoreInfoSummary(data):
                         layout = "horizontal",
                         contents = [
                             TextComponent(
-                                text = f"活動人數：{data[8]}",
+                                text = "修改",
                                 size = "md",
-                                flex = 10,
-                                align = "start"
+                                align = "end",
+                                gravity = "top",
+                                weight = "bold",
+                                action = MessageAction(
+                                    text = "phone"
+                                )
                             )
                         ]
                     ),
@@ -770,10 +823,13 @@ def MoreInfoSummary(data):
                         layout = "horizontal",
                         contents = [
                             TextComponent(
-                                text = f"活動費用：{data[9]}",
+                                text = f"email：{data[5]}",
                                 size = "md",
                                 flex = 10,
                                 align = "start"
+                            ),
+                            SeparatorComponent(
+                                margin = "lg"
                             )
                         ]
                     ),
@@ -781,60 +837,189 @@ def MoreInfoSummary(data):
                         layout = "horizontal",
                         contents = [
                             TextComponent(
-                                text = f"報名截止日：{data[10]}",
+                                text = "修改",
                                 size = "md",
-                                flex = 10,
-                                align = "start"
-                            )
-                        ]
-                    ),
-                    BoxComponent(
-                        layout = "horizontal",
-                        contents = [
-                            TextComponent(
-                                text = f"活動敘述：{data[11]}",
-                                size = "md",
-                                flex = 10,
-                                align = "start"
-                            )
-                        ]
-                    ),
-                    BoxComponent(
-                        layout = "horizontal",
-                        contents = [
-                            TextComponent(
-                                text = f"活動照片：{data[12]}",
-                                size = "md",
-                                flex = 10,
-                                align = "start"
-                            )
-                        ]
-                    ),
-                    BoxComponent(
-                        layout = "horizontal",
-                        contents = [
-                            TextComponent(
-                                text = f"主揪姓名：{data[13]}",
-                                size = "md",
-                                flex = 10,
-                                align = "start"
+                                align = "end",
+                                gravity = "top",
+                                weight = "bold",
+                                action = MessageAction(
+                                    text = "mail"
+                                )
                             )
                         ]
                     )
                 ]
             ),
             footer = BoxComponent(
-                layout = "vertical",
+                layout = "horizontal",
                 contents = [
                     ButtonComponent(
                         style = "link",
                         action = MessageAction(
-                            label = "立即報名",
-                            text = "立即報名"
+                            label = "確認報名",
+                            text = "確認報名"
+                        )
+                    ),
+                    ButtonComponent(
+                        style = "link",
+                        action = MessageAction(
+                            label = "取消報名",
+                            text = "取消"
                         )
                     )
                 ]
             )
+        )
+    )
+    return sumer
+
+
+#詳細資訊summary
+def MoreInfoSummary(data):
+    sumer = FlexSendMessage(
+        alt_text = "詳細活動資訊",
+        contents = BubbleContainer(
+            direction = "ltr",
+            header = BoxComponent(
+                layout = "vertical",
+                contents = [
+                    TextComponent(
+                        text = f"{data[2]}\n活動資訊如下：",
+                        weight = "bold",
+                        size = "md",
+                        align = "start",
+                        color = "#000000"
+                    )
+                ]
+            ),
+            body = BoxComponent(
+                  layout = "vertical",
+                  contents = [
+                      BoxComponent(
+                          layout = "horizontal",
+                          contents = [
+                              TextComponent(
+                                  text = f"活動類型：{data[1]}",
+                                  size = "md",
+                                  flex = 10,
+                                  align = "start",
+                              )
+                          ]
+                      ),
+                      BoxComponent(
+                          layout = "horizontal",
+                          contents = [
+                              TextComponent(
+                                  text = f"活動名稱：{data[2]}",
+                                  size = "md",
+                                  flex = 10,
+                                  align = "start"
+                              )
+                          ]
+                      ),
+                      BoxComponent(
+                          layout = "horizontal",
+                          contents = [
+                              TextComponent(
+                                  text = f"活動時間：{data[3]} {data[4]}",
+                                  size = "md",
+                                  flex = 10,
+                                  align = "start"
+                              )
+                          ]
+                      ),
+                      BoxComponent(
+                          layout = "horizontal",
+                          contents = [
+                              TextComponent(
+                                  text = f"活動地點：{data[5]}",
+                                  size = "md",
+                                  flex = 10,
+                                  wrap = True,
+                                  align = "start"
+                              )
+                          ]
+                      ),
+                      BoxComponent(
+                          layout = "horizontal",
+                          contents = [
+                              TextComponent(
+                                  text = f"活動人數：{data[8]}",
+                                  size = "md",
+                                  flex = 10,
+                                  align = "start"
+                              )
+                          ]
+                      ),
+                      BoxComponent(
+                          layout = "horizontal",
+                          contents = [
+                              TextComponent(
+                                  text = f"活動費用：{data[9]}",
+                                  size = "md",
+                                  flex = 10,
+                                  align = "start"
+                              )
+                          ]
+                      ),
+                      BoxComponent(
+                          layout = "horizontal",
+                          contents = [
+                              TextComponent(
+                                  text = f"報名截止日：{data[10]}",
+                                  size = "md",
+                                  flex = 10,
+                                  align = "start"
+                              )
+                          ]
+                      ),
+                      BoxComponent(
+                          layout = "horizontal",
+                          contents = [
+                              TextComponent(
+                                  text = f"活動敘述：{data[11]}",
+                                  size = "md",
+                                  flex = 10,
+                                  align = "start"
+                              )
+                          ]
+                      ),
+                      BoxComponent(
+                          layout = "horizontal",
+                          contents = [
+                              TextComponent(
+                                  text = f"活動照片：{data[12]}",
+                                  size = "md",
+                                  flex = 10,
+                                  align = "start"
+                              )
+                          ]
+                      ),
+                      BoxComponent(
+                          layout = "horizontal",
+                          contents = [
+                              TextComponent(
+                                  text = f"主揪姓名：{data[13]}",
+                                  size = "md",
+                                  flex = 10,
+                                  align = "start"
+                              )
+                          ]
+                      )
+                  ]
+              ),
+              footer = BoxComponent(
+                  layout = "vertical",
+                  contents = [
+                      ButtonComponent(
+                          style = "link",
+                          action = MessageAction(
+                              label = "立即報名",
+                              text = f"立即報名_{data[0]}_{data[2]}"
+                          )
+                      )
+                  ]
+              )
         )
     )
     return sumer
@@ -877,9 +1062,10 @@ def carousel(data):
                             TextComponent(
                                 text =  "詳細資訊",
                                 align =  "end",
-                                action = PostbackAction(
-                                    data =  f"detail {row[0]}"
-                                )
+                                action = MessageAction(
+                                        label = "詳細資訊",
+                                        text = f"{row[0]}_詳細資訊"
+                                        )
                             )
                         ]
                     )
@@ -989,7 +1175,7 @@ def carousel(data):
                                     style = "link",
                                     action = MessageAction(
                                         label = "立即報名",
-                                        text = f"立即報名 {row[2]}"
+                                        text = f"立即報名_{row[0]}_{row[2]}"
                                         ),
                                     height = "sm",
                                     margin = "none",
@@ -999,7 +1185,7 @@ def carousel(data):
                                     style = "link",
                                     action = MessageAction(
                                         label = "詳細資訊",
-                                        text = f"{row[2]} 詳細資訊"
+                                        text = f"{row[0]}_詳細資訊"
                                         ),
                                     height = "sm",
                                     margin = "none",
@@ -1016,8 +1202,10 @@ def carousel(data):
             if len(bubbles) > 9:
                 break
     else:
-        bubbles=BubbleContainer(
+        bubbles=[BubbleContainer(
+            direction = "ltr", 
             body = BoxComponent(
+                size="xs",
                 layout = "vertical",
                 spacing =  "md",
                 contents = [
@@ -1029,8 +1217,8 @@ def carousel(data):
                     )
                 ]
             )
-        )
-    
+        )]
+    print("bubbles = ",bubbles)
     msg_carousel = FlexSendMessage(
         alt_text = "可報名活動",
         contents = CarouselContainer(
