@@ -66,24 +66,50 @@ def echo(event):
             conn.commit()
             
             #創建一列(condition = initial)
-            postgres_insert_query = f"""INSERT INTO group_data (condition, user_id, attendee) VALUES ('initial', '{event.source.user_id}', '1');"""
+            postgres_insert_query = f"""INSERT INTO group_data (condition, user_id, attendee, photo, description) VALUES ('initial', '{event.source.user_id}', '1', '無', '無');"""
             cursor.execute(postgres_insert_query)
             conn.commit()
+            #撈主揪的資料
+            postgres_select_query=f'''SELECT name,phone FROM group_data WHERE user_id = '{event.source.user_id}' AND condition!= 'initial' ORDER BY activity_no DESC;'''
+            cursor.execute(postgres_select_query)
+            data_for_basicinfo = cursor.fetchone()
+
+            if data_for_basicinfo:
+                postgres_insert_query = f"""UPDATE group_data SET name='{data_for_basicinfo[0]}' , phone='{data_for_basicinfo[1]}' WHERE (condition, user_id) = ('initial', '{event.source.user_id}');"""
+                cursor.execute(postgres_insert_query)
+                conn.commit()
 
             cursor.close()
             conn.close()
 
         #中途想結束輸入~delete, 把initial那列刪除
-        elif event.message.text == "取消":
-            line_bot_api.reply_message(
-                event.reply_token,
-                TextSendMessage(text='取消成功')
-            )
+        elif event.message.text == "取消" :
+            postgres_select_query=f'''SELECT * FROM group_data WHERE user_id = '{event.source.user_id}' AND condition= 'initial';'''
+            cursor.execute(postgres_select_query)
+            data = cursor.fetchone()
+            
+            postgres_select_query=f'''SELECT * FROM group_data WHERE user_id = '{event.source.user_id}' AND condition= 'initial';'''
+            cursor.execute(postgres_select_query)
+            data_2 = cursor.fetchone()
 
             postgres_delete_query = f"""DELETE FROM group_data WHERE (condition, user_id) = ('initial', '{event.source.user_id}');"""
             cursor.execute(postgres_delete_query)
             conn.commit()
-        
+            postgres_delete_query = f"""DELETE FROM registration_data WHERE (condition, user_id) = ('initial', '{event.source.user_id}');"""
+            cursor.execute(postgres_delete_query)
+            conn.commit()
+            
+            
+            if data or data_2:
+                line_bot_api.reply_message(
+                    event.reply_token,
+                    TextSendMessage(text='取消成功')
+                )
+            else:
+                    line_bot_api.reply_message(
+                    event.reply_token,
+                    TextSendMessage(text='無可取消的開團/報名資料')
+                )
         
         elif event.message.text == "~join":
             msg=flexmsg.activity_type
@@ -296,10 +322,13 @@ def echo(event):
                             cursor.execute(postgres_update_query)
                             conn.commit()  
 
-                        postgres_select_query = f"""SELECT * FROM registration_data WHERE condition = 'initial' AND user_id = '{event.source.user_id}';"""
-                        cursor.execute(postgres_select_query)
-                        data_2 = cursor.fetchone() #準備寫入報名資料的那一列  
-                        print("i_2 = ",i_2)
+                    postgres_select_query = f"""SELECT * FROM registration_data WHERE condition = 'initial' AND user_id = '{event.source.user_id}';"""
+                    cursor.execute(postgres_select_query)
+                    data_2 = cursor.fetchone() #準備寫入報名資料的那一列  
+                    print("i_2 = ",i_2)
+                    print("data_2 = ",data_2)
+
+
                     if None in data_2:
                         msg_2 = flexmsg.extend(i_2+1,data_2) #flexmsg需要新增報名情境
                         line_bot_api.reply_message(
@@ -412,29 +441,11 @@ def gathering(event):
 
         record = event.postback.params['datetime']
         record=record.split("T")
-        postgres_update_query = f"""UPDATE group_data SET ({column_all[i]},{column_all[i+1]}) = ('{record[0]}','{record[1]}') WHERE condition = 'initial' AND user_id = '{event.source.user_id}';"""
+        temp=dt.date.fromisoformat(record[0])-dt.timedelta(days=1)
+        postgres_update_query = f"""UPDATE group_data SET ({column_all[i]},{column_all[i+1]},{column_all[i+7]} ) = ('{record[0]}','{record[1]}','{temp}') WHERE condition = 'initial' AND user_id = '{event.source.user_id}';"""
         cursor.execute(postgres_update_query)
         conn.commit()
-        cursor.execute(postgres_select_query)
-        data = cursor.fetchone()
-
-        print("227 i = ",i)
-        if None in data:
-            msg=flexmsg.flex(i,data)
-            line_bot_api.reply_message(
-                event.reply_token,
-                msg)
-        elif None not in data:
-            postgres_select_query = f"""SELECT * FROM group_data WHERE user_id = '{event.source.user_id}' ORDER BY record_no DESC;"""
-            cursor.execute(postgres_select_query)
-            data = cursor.fetchone()
-            msg=flexmsg.summary(data)
-            line_bot_api.reply_message(
-                event.reply_token,
-                msg
-            )
-        cursor.close()
-        conn.close()
+        
         #處理due date
     elif event.postback.data == "Due_time":
 
@@ -442,25 +453,26 @@ def gathering(event):
         postgres_update_query = f"""UPDATE group_data SET {column_all[i]} = '{record}' WHERE condition = 'initial' AND user_id = '{event.source.user_id}';"""
         cursor.execute(postgres_update_query)
         conn.commit()
+        
+    cursor.execute(postgres_select_query)
+    data = cursor.fetchone()
+
+    if None in data:
+        msg=flexmsg.flex(i,data)
+        line_bot_api.reply_message(
+            event.reply_token,
+            msg)
+    elif None not in data:
+        postgres_select_query = f"""SELECT * FROM group_data WHERE user_id = '{event.source.user_id}' ORDER BY activity_no DESC;"""
         cursor.execute(postgres_select_query)
         data = cursor.fetchone()
-
-        if None in data:
-            msg=flexmsg.flex(i,data)
-            line_bot_api.reply_message(
-                event.reply_token,
-                msg)
-        elif None not in data:
-            postgres_select_query = f"""SELECT * FROM group_data WHERE user_id = '{event.source.user_id}' ORDER BY record_no DESC;"""
-            cursor.execute(postgres_select_query)
-            data = cursor.fetchone()
-            msg=flexmsg.summary(data)
-            line_bot_api.reply_message(
-                event.reply_token,
-                msg
-            )
-        cursor.close()
-        conn.close()
+        msg=flexmsg.summary(data)
+        line_bot_api.reply_message(
+            event.reply_token,
+            msg
+        )
+    cursor.close()
+    conn.close()
 
 # location 事件
 @handler.add(MessageEvent, message=LocationMessage)
