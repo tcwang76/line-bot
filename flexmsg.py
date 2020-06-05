@@ -15,8 +15,7 @@ def extend(j,date):
             j=3
         elif j=='phone':
             j=4
-        elif j=='mail':
-            j=5
+
     return flex(j+9,date)
 
 # 給開團者用的
@@ -401,7 +400,7 @@ def summary(data):
                         layout = "horizontal",
                         contents = [
                             TextComponent(
-                                text = f"活動時間：{data[3]} {data[4]}",
+                                text = f"活動時間：{data[3]} {str(data[4])[:5]}",
                                 size = "md",
                                 flex = 10,
                                 align = "start"
@@ -657,35 +656,6 @@ def summary(data):
                                 )
                             )
                         ]
-                    ),
-                    BoxComponent(
-                        layout = "horizontal",
-                        contents = [
-                            TextComponent(
-                                text = f"主揪email：{data[15]}",
-                                size = "md",
-                                flex = 10,
-                                align = "start"
-                            ),
-                            SeparatorComponent(
-                                margin = "lg"
-                            )
-                        ]
-                    ),
-                    BoxComponent(
-                        layout = "horizontal",
-                        contents = [
-                            TextComponent(
-                                text = "修改",
-                                size = "md",
-                                align = "end",
-                                gravity = "top",
-                                weight = "bold",
-                                action = MessageAction(
-                                    text = "mail"
-                                )
-                            )
-                        ]
                     )
                 ]
             ),
@@ -815,35 +785,6 @@ def summary_for_attend(data):
                                 weight = "bold",
                                 action = MessageAction(
                                     text = "phone"
-                                )
-                            )
-                        ]
-                    ),
-                    BoxComponent(
-                        layout = "horizontal",
-                        contents = [
-                            TextComponent(
-                                text = f"email：{data[5]}",
-                                size = "md",
-                                flex = 10,
-                                align = "start"
-                            ),
-                            SeparatorComponent(
-                                margin = "lg"
-                            )
-                        ]
-                    ),
-                    BoxComponent(
-                        layout = "horizontal",
-                        contents = [
-                            TextComponent(
-                                text = "修改",
-                                size = "md",
-                                align = "end",
-                                gravity = "top",
-                                weight = "bold",
-                                action = MessageAction(
-                                    text = "mail"
                                 )
                             )
                         ]
@@ -1151,7 +1092,7 @@ def carousel(data):
                                                     flex = 5,
                                                     ),
                                                 TextComponent(
-                                                    text = f"時間: {row[3]}",
+                                                    text = f"時間: {row[3]} {row[4]}",
                                                     color = "#8c8c8c",
                                                     size = "xs",
                                                     ),
@@ -1626,4 +1567,3 @@ def carousel(data):
 
 
 # #報名Summary
-
