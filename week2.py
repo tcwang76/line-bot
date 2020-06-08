@@ -426,53 +426,117 @@ def gathering(event):
     DATABASE_URL = os.environ['DATABASE_URL']
     conn = psycopg2.connect(DATABASE_URL, sslmode='require')
     cursor = conn.cursor()
-    postgres_select_query = f"""SELECT * FROM group_data WHERE condition = 'initial' AND user_id = '{event.source.user_id}';"""
-    cursor.execute(postgres_select_query)
-    data = cursor.fetchone()
 
-    i = data.index(None)
-    print("i =",i)
     column_all = ['acrivity_no', 'activity_type', 'activity_name', 
                   'activity_date', 'activity_time', 'location_tittle', 'lat', 'long', 'people', 'cost', 
                   'due_date', 'description', 'photo', 'name', 
                   'phone', 'mail', 'attendee', 'condition', 'user_id']
-    #處理activity date and time
-    if event.postback.data == "Activity_time" :
-
-        record = event.postback.params['datetime']
-        record=record.split("T")
-        temp=dt.date.fromisoformat(record[0])-dt.timedelta(days=1)
-        postgres_update_query = f"""UPDATE group_data SET ({column_all[i]},{column_all[i+1]},{column_all[i+7]} ) = ('{record[0]}','{record[1]}','{temp}') WHERE condition = 'initial' AND user_id = '{event.source.user_id}';"""
-        cursor.execute(postgres_update_query)
-        conn.commit()
+    
+    #主揪查看自己開的團的資訊 (活動名稱、地點、時間、費用、已報名人數)
+    if "開團資訊" in postback_data:
+        activity_no = postback_data.replace("開團資訊", "")
         
-        #處理due date
-    elif event.postback.data == "Due_time":
-
-        record = event.postback.params['date']
-        postgres_update_query = f"""UPDATE group_data SET {column_all[i]} = '{record}' WHERE condition = 'initial' AND user_id = '{event.source.user_id}';"""
-        cursor.execute(postgres_update_query)
-        conn.commit()
-        
-    cursor.execute(postgres_select_query)
-    data = cursor.fetchone()
-
-    if None in data:
-        msg=flexmsg.flex(i,data)
-        line_bot_api.reply_message(
-            event.reply_token,
-            msg)
-    elif None not in data:
-        postgres_select_query = f"""SELECT * FROM group_data WHERE user_id = '{event.source.user_id}' ORDER BY activity_no DESC;"""
+        postgres_select_query = f"""SELECT * FROM group_data WHERE activity_no = '{activity_no}';"""
         cursor.execute(postgres_select_query)
-        data = cursor.fetchone()
-        msg=flexmsg.summary(data)
+        group_data = cursor.fetchone()
+
+        print("group_data = ", group_data)
+
+        msg = flexmsg.MyGroupInfo(group_data)
         line_bot_api.reply_message(
             event.reply_token,
             msg
-        )
-    cursor.close()
-    conn.close()
+            )
+        
+    #主揪查看報名者資訊(報名者暱稱、電話)
+    elif "報名者資訊" in postback_data:
+        activity_no = postback_data.replace("報名者資訊", "")
+
+        postgres_select_query = f"""SELECT activity_name FROM registration_data WHERE activity_no = '{activity_no}';"""
+        cursor.execute(postgres_select_query)
+        activity_name = "".join(cursor.fetchone())
+        print("activity_name = ", activity_name)
+        
+        postgres_select_query = f"""SELECT attendee_name, phone FROM registration_data WHERE activity_no = '{activity_no}';"""
+        cursor.execute(postgres_select_query)
+        attendee_data = cursor.fetchall()
+        print("attendee_data = ", attendee_data)
+        
+        attendee_lst = []
+        for row in attendee_data:
+            attendee_lst.append(" ".join(row))
+
+        msg = f"{activity_name}"+"\n報名者資訊："
+        for attendee in attendee_lst:
+            msg += f"\n{attendee}"
+            
+        line_bot_api.reply_message(
+            event.reply_token,
+            TextSendMessage(text = msg)
+            )
+
+    #主揪提早關團
+    elif "結束報名" in postback_data:
+        activity_no = postback_data.replace("結束報名", "")
+        
+        postgres_update_query = f"""UPDATE group_data SET condition = 'closed' WHERE activity_no = '{activity_no}';"""
+        cursor.execute(postgres_update_query)
+        conn.commit()
+
+        line_bot_api.reply_message(
+            event.reply_token,
+            TextSendMessage(text = "成功結束報名！")
+            )
+
+    else:
+        postgres_select_query = f"""SELECT * FROM group_data WHERE condition = 'initial' AND user_id = '{user}';"""
+        cursor.execute(postgres_select_query)
+        data = cursor.fetchone()
+
+        i = data.index(None)
+        print("i = ",i)
+
+        #處理activity date and time
+        if event.postback.data == "Activity_time" :
+
+            record = event.postback.params['datetime']
+            record = record.split("T")
+            due = dt.date.fromisoformat(record[0]) - dt.timedelta(days=1)
+            
+            postgres_update_query = f"""UPDATE group_data SET ({column_all[i]}, {column_all[i+1]}, {column_all[i+7]}) = ('{record[0]}','{record[1]}', '{due}') WHERE condition = 'initial' AND user_id = '{user}';"""
+            cursor.execute(postgres_update_query)
+            conn.commit()
+
+        #處理due date
+        elif event.postback.data == "Due_time":
+
+            record = event.postback.params['date']
+            postgres_update_query = f"""UPDATE group_data SET {column_all[i]} = '{record}' WHERE condition = 'initial' AND user_id = '{user}';"""
+            cursor.execute(postgres_update_query)
+            conn.commit()
+
+        cursor.execute(postgres_select_query)
+        data = cursor.fetchone()
+
+        if None in data:
+            msg = flexmsg.flex(i, data)
+            line_bot_api.reply_message(
+                event.reply_token,
+                msg
+                )
+            
+        elif None not in data:
+            postgres_select_query = f"""SELECT * FROM group_data WHERE user_id = '{user}' ORDER BY activity_no DESC;"""
+            cursor.execute(postgres_select_query)
+            data = cursor.fetchone()
+            msg = flexmsg.summary(data)
+            line_bot_api.reply_message(
+                event.reply_token,
+                msg
+                )
+
+        cursor.close()
+        conn.close()
 
 # location 事件
 @handler.add(MessageEvent, message=LocationMessage)
