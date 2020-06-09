@@ -263,18 +263,55 @@ def echo(event):
                 postgres_insert_query = f"""INSERT INTO registration_data (condition, user_id, activity_no, activity_name ) VALUES ('initial', '{event.source.user_id}','{record[1]}', '{record[2]}');"""
                 cursor.execute(postgres_insert_query)   
                 conn.commit()
+                elif '立即報名' in event.message.text: #點了"立即報名後即回傳activity_no和activity_name"
+                record=event.message.text.split("_")
+                #record[0]:立即報名 record[1]：活動代號 record[2]:活動名稱
+                #刪掉報名失敗的列
+                postgres_delete_query = f"""DELETE FROM registration_data WHERE condition = 'initial' AND user_id = '{event.source.user_id}';"""
+                cursor.execute(postgres_delete_query)
+                conn.commit()
 
-                postgres_select_query = f"""SELECT * FROM registration_data WHERE condition = 'initial' AND user_id = '{event.source.user_id}';"""
+                #創建一列
+                postgres_insert_query = f"""INSERT INTO registration_data (condition, user_id, activity_no, activity_name ) VALUES ('initial', '{event.source.user_id}','{record[1]}', '{record[2]}');"""
+                cursor.execute(postgres_insert_query)   
+                conn.commit()
+                
+                #撈報團者的資料
+                postgres_select_query=f'''SELECT attendee_name, phone FROM registration_data WHERE user_id = '{event.source.user_id}' AND condition!= 'initial' ORDER BY record_no DESC;'''
                 cursor.execute(postgres_select_query)
-                data_2 = cursor.fetchone() #準備寫入報名資料的那一列
-                i_2 = data_2.index(None)
+                data_for_basicinfo = cursor.fetchone()
+                phone= data_for_basicinfo[1]
+                #審核電話
+                postgres_select_query = f"""SELECT phone FROM registration_data WHERE activity_no = '{record[1]}' ;"""
+                cursor.execute(postgres_select_query)
+                phone_registration = cursor.fetchall()
 
-                msg_2 = flexmsg.extend(i_2,data_2) #flexmsg需要新增報名情境
-                line_bot_api.reply_message(
-                    event.reply_token,
-                    msg_2
-                )
+                #如果使用者輸入的電話重複則報名失敗，刪掉原本創建的列
+                if data_for_basicinfo:
 
+                    if (f'{phone}',) in phone_registration:
+                        postgres_select_query = f"""SELECT * FROM registration_data WHERE condition = 'initial' AND user_id = '{event.source.user_id}';"""
+                        cursor.execute(postgres_select_query)
+                        data_2 = cursor.fetchone()
+                        i_2 = data_2.index(None)
+                        msg_2 = flexmsg.extend(i_2,data_2) #flexmsg需要新增報名情境
+                        line_bot_api.reply_message(
+                            event.reply_token,
+                            msg_2
+                        )
+
+                    else:
+                        postgres_update_query = f"""UPDATE registration_data SET attendee_name='{data_for_basicinfo[0]}' , phone='{data_for_basicinfo[1]}' WHERE (condition, user_id) = ('initial', '{event.source.user_id}');"""
+                        cursor.execute(postgres_update_query)
+                        conn.commit()
+                        postgres_select_query = f"""SELECT * FROM registration_data WHERE condition = 'initial' AND user_id = '{event.source.user_id}';"""
+                        cursor.execute(postgres_select_query)
+                        data_2 = cursor.fetchone()
+                        msg_2 = flexmsg.summary_for_attend(data_2)
+                        line_bot_api.reply_message(
+                            event.reply_token,
+                            msg_2
+                        )
             elif data_2:
                 if None in data_2:
                     
