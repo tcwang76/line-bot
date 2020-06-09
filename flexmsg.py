@@ -1158,6 +1158,263 @@ def MyGroupInfo(data):
             )
     return msg
 
+#我的報名列表
+def registration_list(data):
+    if data:
+        tem=[]
+        for row in data:
+            te = BoxComponent(
+                layout = "horizontal",
+                contents = [
+                    BoxComponent(
+                        layout = "horizontal",
+                        flex = 1,
+                        contents = [ 
+                            BoxComponent(
+                                layout =  "baseline",
+                                flex =  1,
+                                contents = [ 
+                                    IconComponent(
+                                        url =  "https://scdn.line-apps.com/n/channel_devcenter/img/fx/review_gold_star_28.png",
+                                        size =  "md"
+                                    )
+                                ]
+                            )
+                        ]
+                    ),
+                    BoxComponent(
+                        layout = "horizontal",
+                        flex =  9,
+                        contents = [ 
+                            TextComponent(
+                                text =  f"{row[2]}",
+                                align =  "start",
+                                weight =  "bold",
+                                action = MessageAction(
+                                    label = f"{row[2]}",
+                                    text = f"{row[1]}_查報名"
+                                )    
+                            )
+                        ]
+                    )
+                ]
+            )
+            tem.append(te)
+            if len(tem)>7:
+                break
+
+        bubble = BubbleContainer(
+            size = "kilo",
+            direction = "ltr",
+            header = BoxComponent(
+            layout = "horizontal",
+            contents = [ 
+                TextComponent(
+                    text =  "我的報名列表",
+                    size =  "lg",
+                    weight =  "bold",
+                    color =  "#AAAAAA"
+                )
+            ]
+            ),
+            body = BoxComponent(
+                layout = "vertical",
+                spacing = "md",
+                contents = tem
+            ),
+            footer = BoxComponent(
+                layout = "horizontal",
+                contents = [ 
+                    ButtonComponent(
+                        action = PostbackAction(
+                            label =  "上一頁",
+                            data =  "backward"
+                        ),
+                        height = "sm",
+                        style = "primary",
+                        color = "#A7D5E1",
+                        gravity = "bottom"
+                    ),
+                    SeparatorComponent(
+                        margin = "sm",
+                        color = "#FFFFFF"
+                    ),
+                    ButtonComponent(          
+                        action = PostbackAction(
+                        label = "下一頁",
+                        data =  "forward"
+                        ),
+                        height = "sm",
+                        style = "primary",
+                        color = "#A7D5E1",
+                        gravity = "bottom"
+                    )
+                ]
+            )
+        )
+
+    else:
+        bubble = BubbleContainer(
+            direction = "ltr", 
+            body = BoxComponent(
+                size="xs",
+                layout = "vertical",
+                spacing =  "md",
+                contents = [
+                    TextComponent(
+                        text =  "目前無報名資料",
+                        size =  "lg",
+                        weight =  "bold",
+                        color =  "#AAAAAA"
+                    )
+                ]
+            )
+        )
+
+    msg_regis = FlexSendMessage(
+        alt_text = "報名列表",
+        contents = bubble
+    )
+
+    return msg_regis
+
+#活動資訊與報名資訊carousel
+def carousel_registration(data,data2):
+    group_info = BubbleContainer(
+        size = "kilo",
+        direction = "ltr",
+        hero = ImageComponent(
+            size = "full",
+            aspectMode = "cover",
+            aspectRatio = "320:213",
+            url = "https://scdn.line-apps.com/n/channel_devcenter/img/flexsnapshot/clip/clip11.jpg"
+        ),
+        body = BoxComponent(
+            layout = "vertical",
+            contents = [
+                TextComponent(
+                    text = f"[{data[2]}]活動資訊",
+                    weight = "bold",
+                    size = "md",
+                    wrap = True
+                ),
+                BoxComponent(
+                    layout = "vertical",
+                    contents = [
+                        BoxComponent(
+                            layout = "vertical",
+                            spacing = "sm",
+                            contents = [
+                                TextComponent(
+                                    text = f"地點 {data[5]}",
+                                    wrap = True,
+                                    size = "sm",
+                                    flex = 5
+                                ),
+                                TextComponent(
+                                    text = f"時間 {data[3]} {data[4]}",
+                                    size = "sm"
+                                ),
+                                TextComponent(
+                                    text = f"費用 {data[9]}",
+                                    size = "sm"
+                                ),
+                                TextComponent(
+                                    text = f"主揪 {data[13]}",
+                                    size = "sm"
+                                ),
+                                TextComponent(
+                                    text = f"主揪電話 {data[14]}",
+                                    size = "sm"
+                                )
+                            ]
+                        )
+                    ]
+                )
+            ],
+        paddingAll = "13px",
+        spacing = "md"
+        )
+    )
+            
+    bubbles = [group_info]
+    
+    for row in data2:
+        temp = BubbleContainer(
+            size = "kilo",
+            direction = "ltr",
+            header = BoxComponent(
+                layout = "vertical",
+                contents = [
+                    TextComponent(
+                        text = "報名資訊：",
+                        weight = "bold",
+                        size = "md",
+                        align = "start",
+                        color = "#000000"
+                    )
+                ]
+            ),
+            body = BoxComponent(
+                layout = "vertical",
+                contents = [
+                    BoxComponent(
+                        layout = "vertical",
+                        contents = [
+                            BoxComponent(
+                                layout = "vertical",
+                                spacing = "sm",
+                                contents = [
+                                    TextComponent(
+                                        text = f"活動序號：{row[1]}",
+                                        wrap = True,
+                                        size = "sm",
+                                        flex = 5
+                                    ),
+                                    TextComponent(
+                                        text = f"活動名稱：{row[2]}",
+                                        size = "sm"
+                                    ),
+                                    TextComponent(
+                                        text = f"姓名：{row[3]}",
+                                        size = "sm"
+                                    ),
+                                    TextComponent(
+                                        text = f"電話：{row[4]}",
+                                        size = "sm"
+                                    )
+                                ]
+                            )
+                        ]    
+                    )
+                ]
+            ),
+            footer = BoxComponent(
+                layout = "horizontal",
+                contents = [
+                    ButtonComponent(
+                        action = MessageAction(
+                            label = "取消報名",
+                            text = f"{row[0]}_{row[1]}_取消報名"
+                        ),
+                        height = "sm",
+                        style = "primary",
+                        color = "#A7D5E1",
+                        gravity = "bottom"
+                    )
+                ]    
+            )     
+        )
+        bubbles.append(temp)
+
+    info_carousel = FlexSendMessage(
+        alt_text = "活動資訊與報名資訊",
+        contents = CarouselContainer(
+            contents = bubbles
+        )
+    )
+    return info_carousel
+
 #尚需加入活動index bubble
 def carousel(data): 
 
