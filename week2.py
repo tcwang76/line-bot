@@ -117,8 +117,27 @@ def echo(event):
                 event.reply_token,
                 msg
             )
+            
+        elif event.message.text == "~查詢我的報名":
+            #用user_id從database找出有報的團
+            postgres_select_query = f"""SELECT * FROM registration_data WHERE user_id = '{event.source.user_id}';"""
+            cursor.execute(postgres_select_query)
 
-
+            #避免look_up_data_registration裡的actinity_name重複
+            look_up_data_registration = []
+            act_no = []
+            alldata = cursor.fetchall()
+            if alldata:
+                for act in alldata: 
+                    if act[1] not in act_no:  #act[1]為activity_no, act[2]為activity_name
+                        act_no.append(act[1])
+                        look_up_data_registration.append(act)
+                        
+            msg = flexmsg.registration_list(look_up_data_registration)
+            line_bot_api.reply_message(
+                event.reply_token,
+                msg
+            )
         
         #如果有創建了一列, 則接下來的資料繼續寫入
         else:
@@ -436,6 +455,54 @@ def echo(event):
                                 TextSendMessage(text= 'please enter the column you want to edit')
                             )
             
+            elif "查報名" in event.message.text: #點選列表裡的活動將回傳(activity_no_查報名)
+                activity_no = event.message.text.split('_')[0]
+
+                #根據回傳的activity_no，從group_data裡找到活動資訊
+                postgres_select_query = f"""SELECT * FROM group_data WHERE activity_no = {activity_no};"""
+                cursor.execute(postgres_select_query)
+                group_info = cursor.fetchone()
+                #根據回傳的activity_no和user_id找到報名資訊(可能不只一列)
+                postgres_select_query = f"""SELECT * FROM registration_data WHERE activity_no = {activity_no} AND user_id = '{event.source.user_id}';"""
+                cursor.execute(postgres_select_query)
+                registration_info = cursor.fetchall()
+
+                msg = flexmsg.carousel_registration(group_info, registration_info)
+                line_bot_api.reply_message(
+                    event.reply_token,
+                    msg
+                )    
+                    # bubble的input為"group_info"和"registration_info"
+                    # 報名資訊要有"取消報名"按鈕
+
+            elif "取消報名" in event.message.text: #按下取消報名按鈕將回傳(record_activity_取消報名)
+                record_no = event.message.text.split('_')[0]
+                activity_no = event.message.text.split('_')[1]
+        
+                postgres_delete_query = f"""DELETE FROM registration_data WHERE record_no = {record_no} AND user_id = '{event.source.user_id}';"""
+                cursor.execute(postgres_delete_query)
+                conn.commit()
+        
+                #找報該團現在的報名人數attendee並更新(-1)
+                postgres_select_query = f"""SELECT attendee FROM group_data WHERE activity_no = {activity_no};"""
+                cursor.execute(postgres_select_query)
+                attendee = cursor.fetchone()[0]
+                attendee -= 1
+
+                #將更新的報名人數attendent記錄到報名表單group_data裡
+                postgres_update_query = f"""UPDATE group_data SET attendee = {attendee} WHERE activity_no = {activity_no};"""
+                cursor.execute(postgres_update_query)
+                conn.commit()
+
+                #更新該活動的condition(=pending)
+                postgres_update_query = f"""UPDATE group_data SET condition = 'pending' WHERE activity_no = {activity_no};"""
+                cursor.execute(postgres_update_query)
+                conn.commit()
+
+                line_bot_api.reply_message(
+                    event.reply_token,
+                    TextSendMessage(text="取消成功!")
+                )
             
             else:
 
