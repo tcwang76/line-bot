@@ -8,6 +8,7 @@ from linebot.models import (
     SeparatorComponent, QuickReply, QuickReplyButton,CarouselContainer
 )
 import datetime as dt
+import json
 # 給報名者用的
 def extend(j,date):
     if type(j)==str:
@@ -30,17 +31,17 @@ def flex(i,date):
         msg = people
     elif i == 8 or i == "cost":
         msg = cost
-    elif i == 9 or i == "due_date":
+    elif i == "due_date":
         msg = due_time(date)
     elif i == 10 or i == "description":
         msg = description
     elif i == 11 or i == "photo":
         msg = photo
-    elif i == 12 or i == "name":
+    elif i == "name" or i == 9:
         msg = name
     elif i == 13 or i == "phone":
         msg = phone
-    elif i == 14 or i == "mail" or i ==15:
+    elif i == "mail" or i ==14:
         msg = mail
     elif i == "activity_type":
         msg = activity_type
@@ -974,35 +975,66 @@ def GroupLst(data):
 
         #row [activity_no, activity_type, activity_name, activity_date, activity_time, activity_title, ...]
         for row in data:
-            activity = BoxComponent(
-                layout = "horizontal",
-                flex = 1,
-                contents = [
-                    BoxComponent(
-                        layout =  "baseline",
-                        flex = 1,
-                        contents = [ 
-                            IconComponent(
-                                url =  "https://scdn.line-apps.com/n/channel_devcenter/img/fx/review_gold_star_28.png",
-                                size =  "sm"
-                            ),
-                            TextComponent(
-                                text =  f"{row[2]}", #activity_name
-                                align =  "start",
-                                size = "md",
-                                color = "#227C9D",
-                                weight =  "regular",
-                                margin= "sm",
-                                flex = 9,
-                                action = PostbackAction(
-                                    data = f"開團資訊 {row[0]}"  #activity_no
-                                    )
-                                )
-                            ]
-                        )
-                    ]
-                )
-            group_lst.append(activity)
+            
+            activity =f'''{{
+              "type": "box",
+              "layout": "horizontal",
+              "contents": [
+                {{
+                  "type": "image",
+                  "url": "https://scdn.line-apps.com/n/channel_devcenter/img/fx/review_gold_star_28.png",
+                  "flex": 1,
+                  "align": "start",
+                  "size": "sm"
+                }},
+                {{
+                  "type": "text",
+                  "text": "{row[2]}",
+                  "flex": 9,
+                  "size": "lg",
+                  "align" :  "start",
+                  "color" : "#227C9D",
+                  "weight" :  "regular",
+                  "margin": "sm",
+                  "action": {{
+                  "type": "postback",
+                  "data": "開團資訊 {row[0]}"
+                  }}
+                    
+                }}
+              ]
+            }}'''
+
+#             activity = BoxComponent(
+#                 layout = "horizontal",
+#                 flex = 1,
+#                 contents = [
+#                     BoxComponent(
+#                         layout =  "horizontal",
+#                         contents = [ 
+#                             ImageComponent(
+#                                 url =  "https://scdn.line-apps.com/n/channel_devcenter/img/fx/review_gold_star_28.png",
+#                                 size =  "sm",
+#                                 flex = 1
+                                
+#                             ),
+#                             TextComponent(
+#                                 text =  f'{row[2]}', #activity_name
+#                                 align =  "start",
+#                                 size = "md",
+#                                 color = "#227C9D",
+#                                 weight =  "regular",
+#                                 margin= "sm",
+#                                 flex = 9,
+#                                 action = PostbackAction(
+#                                     data = f"開團資訊 {row[0]}"  #activity_no
+#                                     )
+#                                 )
+#                             ]
+#                         )
+#                     ]
+#                 )
+            group_lst.append(json.loads(activity))
             
             if len(group_lst) > 7:
                 break
@@ -1106,7 +1138,11 @@ def MyGroupInfo(data):
                                     size = "sm",
                                     ),
                                 TextComponent(
-                                    text = f"已報名人數 {data[16]}/{data[8]}",
+                                    text = f"已報名人數 {data[15]}/{data[8]}",
+                                    size = "sm",
+                                    ),
+                                TextComponent(
+                                    text = f"狀態 {data[16]}",
                                     size = "sm",
                                     )
                                 ]
@@ -1190,9 +1226,9 @@ def registration_list(data):
                                 text =  f"{row[2]}",
                                 align =  "start",
                                 weight =  "bold",
-                                action = MessageAction(
-                                    label = f"{row[2]}",
-                                    text = f"{row[1]}_查報名"
+                                action = PostbackAction(
+                                    label = f"{row[2]}查報名",
+                                    data = f"{row[1]}_查報名"
                                 )    
                             )
                         ]
@@ -1278,22 +1314,33 @@ def registration_list(data):
 
     return msg_regis
 
-#活動資訊與報名資訊carousel
+ #活動資訊與報名資訊carousel
 def carousel_registration(data,data2):
     group_info = BubbleContainer(
         size = "kilo",
         direction = "ltr",
+        header = BoxComponent(
+            layout = "vertical",
+            contents = [
+                TextComponent(
+                    text = f"活動詳細資訊",
+                    weight = "bold",
+                    size = "md",
+                    wrap = True
+                )
+            ]
+        ),
         hero = ImageComponent(
             size = "full",
+            aspectRatio = "16:9",
             aspectMode = "cover",
-            aspectRatio = "320:213",
             url = "https://scdn.line-apps.com/n/channel_devcenter/img/flexsnapshot/clip/clip11.jpg"
         ),
         body = BoxComponent(
             layout = "vertical",
             contents = [
                 TextComponent(
-                    text = f"[{data[2]}]活動資訊",
+                    text = f"{data[2]}",
                     weight = "bold",
                     size = "md",
                     wrap = True
@@ -1336,9 +1383,9 @@ def carousel_registration(data,data2):
         spacing = "md"
         )
     )
-            
+
     bubbles = [group_info]
-    
+
     for row in data2:
         temp = BubbleContainer(
             size = "kilo",
@@ -1393,9 +1440,10 @@ def carousel_registration(data,data2):
                 layout = "horizontal",
                 contents = [
                     ButtonComponent(
-                        action = MessageAction(
-                            label = "取消報名",
-                            text = f"{row[0]}_{row[1]}_取消報名"
+                        action = PostbackAction(
+                            label = '取消報名',
+                            display_text = "取消報名",
+                            data = f"{row[0]}_{row[1]}_取消報名"
                         ),
                         height = "sm",
                         style = "primary",
@@ -1414,6 +1462,7 @@ def carousel_registration(data,data2):
         )
     )
     return info_carousel
+
 
 #尚需加入活動index bubble
 def carousel(data): 
