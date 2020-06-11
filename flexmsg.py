@@ -2,7 +2,7 @@ from linebot.models import (
     TextSendMessage, MessageAction, URIAction,
     PostbackAction, DatetimePickerAction,
     CameraAction, CameraRollAction, LocationAction,
-    CarouselTemplate, CarouselColumn, PostbackEvent,
+    CarouselTemplate, CarouselColumn, PostbackEvent, FillerComponent,
     FlexSendMessage, BubbleContainer, ImageComponent, BoxComponent,
     TextComponent, SpacerComponent, IconComponent, ButtonComponent,
     SeparatorComponent, QuickReply, QuickReplyButton,CarouselContainer
@@ -10,43 +10,43 @@ from linebot.models import (
 import datetime as dt
 import json
 # 給報名者用的
-def extend(j,date):
+def extend(j,date,progress):
     if type(j)==str:
         if j=='attendee_name':
             j=3
         elif j=='phone':
             j=4
 
-    return flex(j+9,date)
+    return flex(j+9,date,progress)
 
 # 給開團者用的
-def flex(i,date):
+def flex(i,date,progress):
     if i == 1 or i == "activity_name":
-        msg = activity_name
-    elif i == 2 or i == "activity_time":
-        msg = activity_time
+        msg = activity_name(progress)
+    elif i == 2 or i == "activity_date":
+        msg = activity_time(progress)
     elif i == 3 or i == "location":
-        msg=location
+        msg=location(progress)
     elif i == 5 or i == "people":
-        msg = people
+        msg = people(progress)
     elif i == 8 or i == "cost":
-        msg = cost
+        msg = cost(progress)
     elif i == "due_date":
         msg = due_time(date)
     elif i == 10 or i == "description":
         msg = description
     elif i == 11 or i == "photo":
         msg = photo
-    elif i == "name" or i == 9:
-        msg = name
+    elif i == "name" or i == 9 or i==12:
+        msg = name(progress)
     elif i == 13 or i == "phone":
-        msg = phone
+        msg = phone(progress)
     elif i == "mail" or i ==14:
         msg = mail
     elif i == "activity_type":
         msg = activity_type
     else:
-        msg = "try again"
+        msg = TextSendMessage(text = "FlexMessage Bug 爆發中...")
     return msg
 
 activity_type = TextSendMessage(
@@ -83,118 +83,248 @@ activity_type_for_attendee = TextSendMessage(
                 action = PostbackAction(label = "唱歌跳舞", data = "唱歌跳舞", display_text = "唱歌跳舞")
                 )
             ]))
+def activity_name(progress):
+    activity_name = FlexSendMessage(
+        alt_text = "請填寫活動名稱", 
+        contents = BubbleContainer(
+            direction = "ltr",
+            body = BoxComponent(
+                layout = "vertical",
+                contents = [
+                    TextComponent(text = "活動名稱", weight = "bold", size = "lg", align = "center"),
+                    BoxComponent(layout = "baseline", 
+                                 margin = "lg", 
+                                 contents = [
+                                     TextComponent(text = "請問您的活動名稱要叫什麼呢？", 
+                                                   size = "md", 
+                                                   flex = 0, 
+                                                   color = "#666666"
+                                                  )
+                                 ]
+                                )
+                ]
+            ),
+            #進度條的本體
+            footer=BoxComponent(
+                layout = "vertical",
+                margin = "md",
+                contents = [TextComponent(text = f"{progress[1]} / {progress[0]} ", weight = "bold", size = "md"),
+                            BoxComponent(layout = "vertical",
+                                         margin = "md",
+                                         contents = [
+                                             BoxComponent(layout = "vertical", 
+                                                          contents = [FillerComponent()]
+                                                         )
+                                         ],
+                                         width = f"{int(progress[1] / progress[0] * 100 + 0.5 )}%",
+                                         background_color = "#3DE1D0",
+                                         height = "6px"
+                                        )
+                           ]
+            )
+            #進度條的本體/
+        )
+    )
+    return activity_name
 
-activity_name = FlexSendMessage(
-    alt_text = "請填寫活動名稱", 
-    contents = BubbleContainer(
-        direction = "ltr",
-        body = BoxComponent(
-            layout = "vertical",
-            contents = [
-                TextComponent(text = "活動名稱", weight = "bold", size = "lg", align = "center"),
-                BoxComponent(layout = "baseline", margin = "md", contents = [
-                    TextComponent(text = "請問您的活動名稱要叫什麼呢？", 
-                                  size = "md", flex = 0, color = "#666666"
-                        )
-                    ]
+def activity_time(progress):
+    activity_time = FlexSendMessage(
+        alt_text = "請挑選活動時間", 
+        contents = BubbleContainer(
+            direction = "ltr",
+            body = BoxComponent(
+                layout = "vertical",
+                contents =[
+                    TextComponent(
+                        text = "請選擇活動時間",
+                        size = "lg",
+                        align = "center",
+                        weight = "bold"
+                    )
+                ]
+            ),
+            footer = BoxComponent(
+              layout = "vertical",
+              contents = [
+                  BoxComponent(layout = "vertical",
+                                 margin = "md",
+                                 contents = [TextComponent(text = f"{progress[2]} / {progress[0]} ", weight = "bold", size = "md"),
+                                             BoxComponent(layout = "vertical",
+                                                          margin = "md",
+                                                          contents = [
+                                                              BoxComponent(layout = "vertical", 
+                                                                           contents = [FillerComponent()]
+                                                                          )
+                                                          ],
+                                                          width = f"{int(progress[2] / progress[0] * 100 + 0.5 )}%",
+                                                          background_color = "#3DE1D0",
+                                                          height = "6px"
+                                                         )
+
+                                            ]
+                              ),
+                  BoxComponent(layout = "vertical",
+                                 margin = "md",
+                                 contents = [
+                                     ButtonComponent(
+                                         DatetimePickerAction(
+                                             label = "點我選時間",
+                                             data = "Activity_time",
+                                             mode = "datetime"
+                                         ),
+                                         height = "sm",
+                                         margin = "none",
+                                         style = "primary",
+                                         color = "#A7D5E1",
+                                         gravity = "bottom"
+                                     )
+                                 ]
+                              )          
+              ]
+            )
+        )
+    )
+    return activity_time
+
+def location(progress):
+    location = FlexSendMessage(
+        alt_text = "請挑選活動地點", 
+        contents = BubbleContainer(
+            direction = "ltr",
+            body = BoxComponent(
+              layout = "vertical",
+              contents = [
+              TextComponent(
+                  text = "請選擇活動地點",
+                  size = "lg",
+                  align = "center",
+                  weight = "bold"
+                  )
+              ]
+            ),
+            #進度條的本體
+            footer = BoxComponent(
+                layout = "vertical",
+                margin = "md",
+                contents = [BoxComponent(layout = "vertical",
+                                 margin = "md",
+                                 contents = [TextComponent(text = f"{progress[3]} / {progress[0]} ", 
+                                                           weight = "bold", 
+                                                           size = "md"),
+                                             BoxComponent(layout = "vertical",
+                                                          margin = "md",
+                                                          contents = [
+                                                              BoxComponent(layout = "vertical", 
+                                                                           contents = [FillerComponent()]
+                                                                          )
+                                                          ],
+                                                          width = f"{int(progress[3] / progress[0] * 100 + 0.5 )}%",
+                                                          background_color = "#3DE1D0",
+                                                          height = "6px"
+                                                         )
+
+                                            ]
+                              ),
+            #進度條的本體/
+            BoxComponent(
+              layout = "horizontal",
+                margin = "md",
+              contents = [
+                ButtonComponent(
+                    URIAction(
+                        label = "點我選地點",
+                        uri = "https://line.me/R/nv/location"
+                    ),
+                    height = "sm",
+                    margin = "none",
+                    style = "primary",
+                    color = "#A7D5E1",
+                    gravity = "bottom"
                 )
-            ]
-        )))
-
-activity_time = FlexSendMessage(
-    alt_text = "請挑選活動時間", 
-    contents = BubbleContainer(
-        direction = "ltr",
-        body = BoxComponent(
-          layout = "vertical",
-          contents =[
-          TextComponent(
-              text = "請選擇活動時間",
-              size = "lg",
-              align = "center",
-              weight = "bold"
-              )
-          ]
-        ),
-        footer = BoxComponent(
-          layout = "horizontal",
-          contents = [
-            ButtonComponent(
-              DatetimePickerAction(
-                label = "點我選時間",
-                data = "Activity_time",
-                mode = "datetime"
-              )
+              ]
             )
-          ]
-        )
-    )
-)
-
-location = FlexSendMessage(
-    alt_text = "請挑選活動地點", 
-    contents = BubbleContainer(
-        direction = "ltr",
-        body = BoxComponent(
-          layout = "vertical",
-          contents = [
-          TextComponent(
-              text = "請選擇活動地點",
-              size = "lg",
-              align = "center",
-              weight = "bold"
-              )
-          ]
-        ),
-        footer = BoxComponent(
-          layout = "horizontal",
-          contents = [
-            ButtonComponent(
-              URIAction(
-                label = "點我選地點",
-                uri = "https://line.me/R/nv/location"
-              )
+                           ]
             )
-          ]
         )
     )
-)
+    return location
 
-people = FlexSendMessage(
-    alt_text = "請填寫人數", 
-    contents = BubbleContainer(
-        direction = "ltr",
-        body = BoxComponent(
-          layout = "vertical",
-          contents =[
-          TextComponent(
-              text = "請填寫活動參加人數",
-              size = "lg",
-              align = "center",
-              weight = "bold"
-              )
-          ]
+def people(progress):
+    people = FlexSendMessage(
+        alt_text = "請填寫人數", 
+        contents = BubbleContainer(
+            direction = "ltr",
+            body = BoxComponent(
+              layout = "vertical",
+              contents =[
+              TextComponent(
+                  text = "請填寫活動參加人數",
+                  size = "lg",
+                  align = "center",
+                  weight = "bold"
+                  )
+              ]
+            ),
+            #進度條的本體
+            footer=BoxComponent(
+                layout = "vertical",
+                margin = "md",
+                contents = [TextComponent(text = f"{progress[4]} / {progress[0]} ", weight = "bold", size = "md"),
+                            BoxComponent(layout = "vertical",
+                                         margin = "md",
+                                         contents = [
+                                             BoxComponent(layout = "vertical", 
+                                                          contents = [FillerComponent()]
+                                                         )
+                                         ],
+                                         width = f"{int(progress[4] / progress[0] * 100 + 0.5 )}%",
+                                         background_color = "#3DE1D0",
+                                         height = "6px"
+                                        )
+                           ]
+            )
+            #進度條的本體/
         )
     )
-)
-
-cost = FlexSendMessage(
-    alt_text = "請填寫預計支出", 
-    contents = BubbleContainer(
-        direction = "ltr",
-        body = BoxComponent(
-          layout = "vertical",
-          contents = [
-          TextComponent(
-              text = "請填寫預計支出",
-              size = "lg",
-              align = "center",
-              weight = "bold"
-              )
-          ]
+    return people
+def cost(progress):
+    cost = FlexSendMessage(
+        alt_text = "請填寫預計支出", 
+        contents = BubbleContainer(
+            direction = "ltr",
+            body = BoxComponent(
+              layout = "vertical",
+              contents = [
+              TextComponent(
+                  text = "請填寫預計支出",
+                  size = "lg",
+                  align = "center",
+                  weight = "bold"
+                  )
+              ]
+            ),
+            #進度條的本體
+            footer=BoxComponent(
+                layout = "vertical",
+                margin = "md",
+                contents = [TextComponent(text = f"{progress[5]} / {progress[0]} ", weight = "bold", size = "md"),
+                            BoxComponent(layout = "vertical",
+                                         margin = "md",
+                                         contents = [
+                                             BoxComponent(layout = "vertical", 
+                                                          contents = [FillerComponent()]
+                                                         )
+                                         ],
+                                         width = f"{int(progress[5] / progress[0] * 100 + 0.5 )}%",
+                                         background_color = "#3DE1D0",
+                                         height = "6px"
+                                        )
+                           ]
+            )
+            #進度條的本體/
         )
     )
-)
+    return cost
 
 def due_time(date):
     due = FlexSendMessage(
@@ -212,7 +342,10 @@ def due_time(date):
                   )
               ]
             ),
-            footer = BoxComponent(
+            #進度條的本體
+        footer=
+        #進度條的本體/
+            BoxComponent(
                 layout = "horizontal",
                 contents = [ButtonComponent(
                     DatetimePickerAction(
@@ -220,7 +353,12 @@ def due_time(date):
                         data = "Due_time",
                         mode = "date",
                         max = str(date[3])
-                    )
+                    ),
+                    height = "sm",
+                    margin = "none",
+                    style = "primary",
+                    color = "#A7D5E1",
+                    gravity = "bottom"
                 )
               ]
             )
@@ -254,7 +392,7 @@ photo = FlexSendMessage(
           layout = "vertical",
           contents = [
           TextComponent(
-              text = "請提供照片網址，若無網址請先上傳至網路平台（imgurl...等）",
+              text = "請傳送一張照片",
               size = "md",
               wrap = True,
               align = "center",
@@ -264,43 +402,84 @@ photo = FlexSendMessage(
         )
     )
 )
-
-name = FlexSendMessage(
-    alt_text = "請提供名稱", 
-    contents = BubbleContainer(
-        direction = "ltr",
-        body = BoxComponent(
-          layout = "vertical",
-          contents = [
-          TextComponent(
-              text = "請提供您的姓名或是可以辨識之暱稱",
-              size = "md",
-              wrap = True,
-              align = "center",
-              weight = "bold"
-              )
-          ]
+def name(progress):
+    name = FlexSendMessage(
+        alt_text = "請提供名稱", 
+        contents = BubbleContainer(
+            direction = "ltr",
+            body = BoxComponent(
+              layout = "vertical",
+              contents = [
+              TextComponent(
+                  text = "請提供您的姓名或是可以辨識之暱稱",
+                  size = "md",
+                  wrap = True,
+                  align = "center",
+                  weight = "bold"
+                  )
+              ]
+            ),
+            #進度條的本體
+            footer=BoxComponent(
+                layout = "vertical",
+                margin = "md",
+                contents = [TextComponent(text = f"{progress[6]} / {progress[0]} ", weight = "bold", size = "md"),
+                            BoxComponent(layout = "vertical",
+                                         margin = "md",
+                                         contents = [
+                                             BoxComponent(layout = "vertical", 
+                                                          contents = [FillerComponent()]
+                                                         )
+                                         ],
+                                         width = f"{int(progress[6] / progress[0] * 100 + 0.5 )}%",
+                                         background_color = "#3DE1D0",
+                                         height = "6px"
+                                        )
+                           ]
+            )
+            #進度條的本體/
         )
     )
-)
+    return name
 
-phone = FlexSendMessage(
-    alt_text = "請提供電話", 
-    contents = BubbleContainer(
-        direction = "ltr",
-        body = BoxComponent(
-          layout = "vertical",
-          contents = [
-          TextComponent(
-              text = "請提供可以聯絡您的電話號碼",
-              size = "lg",
-              align = "center",
-              weight = "bold"
-              )
-          ]
+def phone(progress):
+    phone = FlexSendMessage(
+        alt_text = "請提供電話", 
+        contents = BubbleContainer(
+            direction = "ltr",
+            body = BoxComponent(
+              layout = "vertical",
+              contents = [
+              TextComponent(
+                  text = "請提供可以聯絡您的電話號碼",
+                  size = "lg",
+                  align = "center",
+                  weight = "bold"
+                  )
+              ]
+            ),
+            #進度條的本體
+            footer=BoxComponent(
+                layout = "vertical",
+                margin = "md",
+                contents = [TextComponent(text = f"{progress[7]} / {progress[0]} ", weight = "bold", size = "md"),
+                            BoxComponent(layout = "vertical",
+                                         margin = "md",
+                                         contents = [
+                                             BoxComponent(layout = "vertical", 
+                                                          contents = [FillerComponent()]
+                                                         )
+                                         ],
+                                         width = f"{int(progress[7] / progress[0] * 100 + 0.5 )}%",
+                                         background_color = "#3DE1D0",
+                                         height = "6px"
+                                        )
+                           ]
+            )
+            #進度條的本體/
         )
     )
-)
+    return phone
 
 mail = FlexSendMessage(
     alt_text = "請提供信箱", 
@@ -320,6 +499,12 @@ mail = FlexSendMessage(
     )
 )
 def summary(data):
+    if data[12]=='無':
+        act=None
+        col="#141414"
+    else:
+        act=URIAction(uri = f"{data[12]}")
+        col="#229C8F"
     sumer = FlexSendMessage(
         alt_text = "請確認開團資訊",
         contents = BubbleContainer(
@@ -578,7 +763,10 @@ def summary(data):
                                 text = f"活動照片：{data[12]}",
                                 size = "md",
                                 flex = 10,
-                                align = "start"
+                                align = "start",
+                                action= act,
+                                wrap = True,
+                                color = f"{col}"
                             ),
                             SeparatorComponent(
                                 margin = "lg"
@@ -665,13 +853,22 @@ def summary(data):
                 contents = [
                     ButtonComponent(
                         style = "link",
+                        height = "sm",
+                        margin = "none",
+                        color = "#229C8F",
+                        gravity = "bottom",
                         action = MessageAction(
                             label = "確認開團",
                             text = "確認開團"
                         )
                     ),
+                    SeparatorComponent(),
                     ButtonComponent(
                         style = "link",
+                        height = "sm",
+                        margin = "none",
+                        color = "#229C8F",
+                        gravity = "bottom",
                         action = MessageAction(
                             label = "取消開團",
                             text = "取消"
@@ -695,7 +892,7 @@ def summary_for_attend(data):
               TextComponent(
                   text = "請確認報名資訊：",
                   weight = "bold",
-                  size = "md",
+                  size = "lg",
                   align = "start",
                   color = "#000000"
                   )
@@ -797,13 +994,22 @@ def summary_for_attend(data):
                 contents = [
                     ButtonComponent(
                         style = "link",
+                        height = "sm",
+                        margin = "none",
+                        color = "#229C8F",
+                        gravity = "bottom",
                         action = MessageAction(
                             label = "確認報名",
                             text = "確認報名"
                         )
                     ),
+                    SeparatorComponent(),
                     ButtonComponent(
                         style = "link",
+                        height = "sm",
+                        margin = "none",
+                        color = "#229C8F",
+                        gravity = "bottom",
                         action = MessageAction(
                             label = "取消報名",
                             text = "取消"
@@ -818,6 +1024,12 @@ def summary_for_attend(data):
 
 #詳細資訊summary
 def MoreInfoSummary(data):
+    if "https://i.imgur.com/" not in data[12]:
+        act=None
+        col="#141414"
+    else:
+        act=URIAction(uri = f"{data[12]}")
+        col="#229C8F"
     sumer = FlexSendMessage(
         alt_text = "詳細活動資訊",
         contents = BubbleContainer(
@@ -828,7 +1040,7 @@ def MoreInfoSummary(data):
                     TextComponent(
                         text = f"{data[2]}\n活動資訊如下：",
                         weight = "bold",
-                        size = "md",
+                        size = "lg",
                         align = "start",
                         color = "#000000"
                     )
@@ -863,7 +1075,7 @@ def MoreInfoSummary(data):
                           layout = "horizontal",
                           contents = [
                               TextComponent(
-                                  text = f"活動時間：{data[3]} {data[4]}",
+                                  text = f"活動時間：{data[3]} {str(data[4])[:5]}",
                                   size = "md",
                                   flex = 10,
                                   align = "start"
@@ -933,7 +1145,9 @@ def MoreInfoSummary(data):
                                   text = f"活動照片：{data[12]}",
                                   size = "md",
                                   flex = 10,
-                                  align = "start"
+                                  align = "start",
+                                  action=act,
+                                  color = f"{col}"
                               )
                           ]
                       ),
@@ -955,9 +1169,14 @@ def MoreInfoSummary(data):
                   contents = [
                       ButtonComponent(
                           style = "link",
-                          action = MessageAction(
+                          height = "sm",
+                          margin = "none",
+                          color = "#229C8F",
+                          gravity = "bottom",
+                          action = PostbackAction(
                               label = "立即報名",
-                              text = f"立即報名_{data[0]}_{data[2]}"
+                              data = f"立即報名_{data[0]}_{data[2]}",
+                              display_text = f"我要報名 {data[2]}"
                           )
                       )
                   ]
@@ -981,17 +1200,23 @@ def GroupLst(data):
               "layout": "horizontal",
               "contents": [
                 {{
-                  "type": "image",
-                  "url": "https://scdn.line-apps.com/n/channel_devcenter/img/fx/review_gold_star_28.png",
-                  "flex": 1,
-                  "align": "start",
-                  "size": "sm"
+                    "type": "box",
+                    "layout": "baseline",
+                    "contents": [
+                    {{
+                        "type": "icon",
+                        "url": "https://scdn.line-apps.com/n/channel_devcenter/img/fx/review_gold_star_28.png",
+                        "flex": 1,
+                        "align": "start",
+                        "size": "sm"
+                     }}
+                     ]
                 }},
                 {{
                   "type": "text",
                   "text": "{row[2]}",
                   "flex": 9,
-                  "size": "lg",
+                  "size": "md",
                   "align" :  "start",
                   "color" : "#227C9D",
                   "weight" :  "regular",
@@ -1035,7 +1260,7 @@ def GroupLst(data):
 #                     ]
 #                 )
             group_lst.append(json.loads(activity))
-            
+
             if len(group_lst) > 7:
                 break
             
@@ -1097,7 +1322,10 @@ def GroupLst(data):
 
 #開團資訊
 def MyGroupInfo(data):
-    
+    if "https://i.imgur.com/" not in data[12]:
+        link="https://scdn.line-apps.com/n/channel_devcenter/img/flexsnapshot/clip/clip11.jpg"
+    else:
+        link=f"{data[12]}"
     bubble = BubbleContainer(
         size = "kilo",
         direction = "ltr", 
@@ -1105,7 +1333,7 @@ def MyGroupInfo(data):
             size = "full",
             aspectMode = "cover",
             aspectRatio = "320:213",
-            url = "https://scdn.line-apps.com/n/channel_devcenter/img/flexsnapshot/clip/clip11.jpg"
+            url = f"{link}"
             ),
         body = BoxComponent(
             layout = "vertical",
@@ -1130,7 +1358,7 @@ def MyGroupInfo(data):
                                     flex = 5,
                                     ),
                                 TextComponent(
-                                    text = f"時間 {data[3]}",
+                                    text = f"時間 {data[3]} {str(data[4])[:5]}",
                                     size = "sm",
                                     ),
                                 TextComponent(
@@ -1225,7 +1453,10 @@ def registration_list(data):
                             TextComponent(
                                 text =  f"{row[2]}",
                                 align =  "start",
-                                weight =  "bold",
+                                size = "md",
+                                color = "#227C9D",
+                                weight =  "regular",
+                                margin= "sm",
                                 action = PostbackAction(
                                     label = f"{row[2]}查報名",
                                     data = f"{row[1]}_查報名"
@@ -1316,10 +1547,20 @@ def registration_list(data):
 
  #活動資訊與報名資訊carousel
 def carousel_registration(data,data2):
+    if "https://i.imgur.com/" not in data[12]:
+        link="https://scdn.line-apps.com/n/channel_devcenter/img/flexsnapshot/clip/clip11.jpg"
+    else:
+        link=f"{data[12]}"
     group_info = BubbleContainer(
         size = "kilo",
         direction = "ltr",
-        header = BoxComponent(
+        hero = ImageComponent(
+            size = "full",
+            aspectRatio = "16:9",
+            aspectMode = "cover",
+            url = f"{link}"
+        ),
+        body = BoxComponent(
             layout = "vertical",
             contents = [
                 TextComponent(
@@ -1327,18 +1568,7 @@ def carousel_registration(data,data2):
                     weight = "bold",
                     size = "md",
                     wrap = True
-                )
-            ]
-        ),
-        hero = ImageComponent(
-            size = "full",
-            aspectRatio = "16:9",
-            aspectMode = "cover",
-            url = "https://scdn.line-apps.com/n/channel_devcenter/img/flexsnapshot/clip/clip11.jpg"
-        ),
-        body = BoxComponent(
-            layout = "vertical",
-            contents = [
+                ),
                 TextComponent(
                     text = f"{data[2]}",
                     weight = "bold",
@@ -1359,7 +1589,7 @@ def carousel_registration(data,data2):
                                     flex = 5
                                 ),
                                 TextComponent(
-                                    text = f"時間 {data[3]} {data[4]}",
+                                    text = f"時間 {data[3]} {str(data[4])[:5]}",
                                     size = "sm"
                                 ),
                                 TextComponent(
@@ -1483,7 +1713,7 @@ def carousel(data):
                                 contents = [ 
                                     IconComponent(
                                         url =  "https://scdn.line-apps.com/n/channel_devcenter/img/fx/review_gold_star_28.png",
-                                        size =  "md"
+                                        size =  "sm"
                                     )
                                 ]
                             )
@@ -1496,14 +1726,10 @@ def carousel(data):
                             TextComponent(
                                 text =  f"{row[2]}",
                                 align =  "start",
-                                weight =  "bold"
-                            ),
-                            TextComponent(
-                                text =  "詳細資訊",
-                                align =  "end",
-                                action = MessageAction(
-                                        label = "詳細資訊",
-                                        text = f"{row[0]}_詳細資訊"
+                                weight =  "bold",
+                                action = PostbackAction(
+                                        displat_text = "詳細資訊",
+                                        data = f"{row[0]}_詳細資訊"
                                         )
                             )
                         ]
@@ -1511,7 +1737,7 @@ def carousel(data):
                 ]
             )
             tem.append(te)
-            if len(tem)>7:
+            if len(tem)>8:
                 break
         index=BubbleContainer(
             size = "kilo",
@@ -1540,6 +1766,8 @@ def carousel(data):
                             label =  "上一頁",
                             data =  "backward"
                         ),
+                        color = "#A7D5E1",
+                        gravity = "bottom",
                         height = "sm",
                         style = "link"
                     ),
@@ -1550,13 +1778,22 @@ def carousel(data):
                         label = "下一頁",
                         data =  "forward"
                         ),
-                        height = "sm"
+                        color = "#A7D5E1",
+                        gravity = "bottom",
+                        height = "sm",
+                        style = "link"
                     )
                 ]
             )
         )
         bubbles = [index]
         for row in data:
+            
+            if "https://i.imgur.com/" not in row[12]:
+                link="https://scdn.line-apps.com/n/channel_devcenter/img/flexsnapshot/clip/clip11.jpg"
+            else:
+                link=f"{row[12]}"
+            print("row[12] = ",row[12],"link = ",link)
             temp = BubbleContainer(
                         size = "kilo",
                         direction = "ltr", 
@@ -1564,7 +1801,7 @@ def carousel(data):
                             size = "full",
                             aspectMode = "cover",
                             aspectRatio = "320:213",
-                            url = "https://scdn.line-apps.com/n/channel_devcenter/img/flexsnapshot/clip/clip11.jpg"
+                            url = f"{link}"
                             ),
                         body = BoxComponent(
                             layout = "vertical",
@@ -1590,7 +1827,7 @@ def carousel(data):
                                                     flex = 5,
                                                     ),
                                                 TextComponent(
-                                                    text = f"時間: {row[3]} {row[4]}",
+                                                    text = f"時間: {row[3]} {str(row[4])[:5]}",
                                                     color = "#8c8c8c",
                                                     size = "xs",
                                                     ),
@@ -1612,29 +1849,30 @@ def carousel(data):
                             contents = [
                                 ButtonComponent(
                                     style = "link",
-                                    action = MessageAction(
+                                    action = PostbackAction(
                                         label = "立即報名",
-                                        text = f"立即報名_{row[0]}_{row[2]}"
-                                        ),
+                                        data = f"立即報名_{row[0]}_{row[2]}",
+                                        display_text=f"我要報名{row[2]}"
+                                    ),
                                     height = "sm",
                                     margin = "none",
-                                    gravity = "center"
+                                    color = "#229C8F",
+                                    gravity = "bottom"
                                     ),
+                                SeparatorComponent(),
                                 ButtonComponent(
                                     style = "link",
-                                    action = MessageAction(
+                                    action = PostbackAction(
                                         label = "詳細資訊",
-                                        text = f"{row[0]}_詳細資訊"
+                                        data = f"{row[0]}_詳細資訊",
+                                        display_text = f"{row[0]}詳細資訊"
                                         ),
                                     height = "sm",
                                     margin = "none",
-                                    gravity = "center"
+                                    color = "#229C8F",
+                                    gravity = "bottom"
                                     )
-                                ],
-                            action = MessageAction(
-                                label = "活動1",
-                                text = f"row[2]"
-                                )
+                                ]
                             )
                         )
             bubbles.append(temp)
@@ -1657,7 +1895,7 @@ def carousel(data):
                 ]
             )
         )]
-    print("bubbles = ",bubbles)
+
     msg_carousel = FlexSendMessage(
         alt_text = "可報名活動",
         contents = CarouselContainer(
