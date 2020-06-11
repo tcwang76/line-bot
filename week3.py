@@ -1,18 +1,28 @@
 # 載入需要的模組
 from __future__ import unicode_literals
-import os
+from imgurpython import ImgurClient
+import os, tempfile
 import psycopg2
 import datetime as dt
 from flask import Flask, request, abort
 from linebot import LineBotApi, WebhookHandler
 from linebot.exceptions import InvalidSignatureError
-from linebot.models import MessageEvent, TextMessage, TextSendMessage, ImageSendMessage, PostbackEvent, LocationMessage
+from linebot.models import MessageEvent, TextMessage, TextSendMessage, ImageSendMessage, PostbackEvent, LocationMessage, ImageMessage
 import configparser
 import flexmsg
 
 app = Flask(__name__)
-
-
+#存圖片要用
+static_tmp_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'static', 'tmp')
+# # function for create tmp dir for download content
+# def make_static_tmp_dir():
+#     try:
+#         os.makedirs(static_tmp_path)
+#     except OSError as exc:
+#         if exc.errno == errno.EEXIST and os.path.isdir(static_tmp_path):
+#             pass
+#         else:
+#             raise
 # LINE 聊天機器人的基本資料
 config = configparser.ConfigParser()
 config.read('config.ini')
@@ -45,8 +55,12 @@ def callback():
 # 學你說話
 @handler.add(MessageEvent, message=TextMessage)
 def echo(event):
-    
-     if event.source.user_id != "Udeadbeefdeadbeefdeadbeefdeadbeef":
+    # [0] 總題數 [1:]目前題數 
+    progress_list_fullgroupdata=[7, 1, 2, 3, 4, 5, 6 ,7 ]
+    progress_list_halfgroupdata=[5, 1, 2, 3, 4, 5]
+    progress_list_fullregistrationdata=[2, 0, 0, 0, 0, 0, 1, 2]
+    #progress_target
+    if event.source.user_id != "Udeadbeefdeadbeefdeadbeefdeadbeef":
         #連結到heroku資料庫
         DATABASE_URL = os.environ['DATABASE_URL']
         conn = psycopg2.connect(DATABASE_URL, sslmode='require')
@@ -62,6 +76,9 @@ def echo(event):
 
             #把只創建卻沒有寫入資料的列刪除
             postgres_delete_query = f"""DELETE FROM group_data WHERE (condition) = ('initial');"""
+            cursor.execute(postgres_delete_query)
+            conn.commit()
+            postgres_delete_query = f"""DELETE FROM registration_data WHERE (condition) = ('initial');"""
             cursor.execute(postgres_delete_query)
             conn.commit()
             
@@ -143,44 +160,58 @@ def echo(event):
                           'phone', 'mail', 'attendee', 'condition', 'user_id']
 
             if data:
-                
+                try:
+                    if len(data[14])>0:
+                        progress_target = progress_list_halfgroupdata
+                    else :
+                        progress_target = progress_list_fullgroupdata
+                except:
+                    progress_target = progress_list_fullgroupdata
+                    
                 if None in data:
                     i = data.index(None)
                     print("i= ",i)
-                    record = event.message.text
-                    #如果使用者輸入的資料不符合資料庫的資料型態, 則輸入N/A
-                    try:
-                        postgres_update_query = f"""UPDATE group_data SET {column_all[i]} = '{record}' WHERE condition = 'initial' AND user_id = '{event.source.user_id}';"""
-                        cursor.execute(postgres_update_query)
-                        conn.commit()
-                    except:
+                    if i==5:
                         line_bot_api.reply_message(
                             event.reply_token,
-                            TextSendMessage(text="請重新輸入")
+                            [TextSendMessage(text="請點選按鈕選擇活動地點，謝謝。"),flexmsg.location(progress_target)]
                         )
-                    
-                   #如果還沒輸入到最後一格, 則繼續詢問下一題
-                    postgres_select_query = f"""SELECT * FROM group_data WHERE condition = 'initial'AND user_id = '{event.source.user_id}';"""
-                    cursor.execute(postgres_select_query)
-                    data = cursor.fetchone()
-                
-                    if None in data: 
-                        msg=flexmsg.flex(i,data)
-                        line_bot_api.reply_message(
-                            event.reply_token,
-                            msg)
 
-                    #如果已經到最後一格, condition改為finish, 回覆summary，
-                    elif None not in data:
-                        
-                        postgres_select_query = f"""SELECT * FROM group_data WHERE user_id = '{event.source.user_id}' ORDER BY activity_no DESC;"""
+                    else:
+                        record = event.message.text
+                        #如果使用者輸入的資料不符合資料庫的資料型態, 則輸入N/A
+                        try:
+                            postgres_update_query = f"""UPDATE group_data SET {column_all[i]} = '{record}' WHERE condition = 'initial' AND user_id = '{event.source.user_id}';"""
+                            cursor.execute(postgres_update_query)
+                            conn.commit()
+                        except:
+                            line_bot_api.reply_message(
+                                event.reply_token,
+                                TextSendMessage(text="請重新輸入")
+                            )
+
+                       #如果還沒輸入到最後一格, 則繼續詢問下一題
+                        postgres_select_query = f"""SELECT * FROM group_data WHERE condition = 'initial'AND user_id = '{event.source.user_id}';"""
                         cursor.execute(postgres_select_query)
                         data = cursor.fetchone()
-                        msg=flexmsg.summary(data)
-                        line_bot_api.reply_message(
-                            event.reply_token,
-                            msg
-                        )
+
+                        if None in data: 
+                            msg=flexmsg.flex(i,data,progress_target)
+                            line_bot_api.reply_message(
+                                event.reply_token,
+                                msg)
+
+                        #如果已經到最後一格, condition改為finish, 回覆summary，
+                        elif None not in data:
+
+                            postgres_select_query = f"""SELECT * FROM group_data WHERE user_id = '{event.source.user_id}' ORDER BY activity_no DESC;"""
+                            cursor.execute(postgres_select_query)
+                            data = cursor.fetchone()
+                            msg=flexmsg.summary(data)
+                            line_bot_api.reply_message(
+                                event.reply_token,
+                                msg
+                            )
   
                 else:
                     if event.message.text == '確認開團':
@@ -204,7 +235,8 @@ def echo(event):
                             postgres_update_query = f"""UPDATE group_data SET location_tittle = Null WHERE condition = 'initial' AND user_id = '{event.source.user_id}';"""
                             cursor.execute(postgres_update_query)
                             conn.commit()
-                            msg=flexmsg.flex(column,data)
+                            progress_target=[7, 6, 6, 6, 6, 6, 6, 6 ]
+                            msg=flexmsg.flex(column,data,progress_target)
                             line_bot_api.reply_message(
                                 event.reply_token,
                                 msg
@@ -213,7 +245,8 @@ def echo(event):
                             postgres_update_query = f"""UPDATE group_data SET {column} = Null WHERE condition = 'initial' AND user_id = '{event.source.user_id}';"""
                             cursor.execute(postgres_update_query)
                             conn.commit()
-                            msg=flexmsg.flex(column,data)
+                            progress_target=[7, 6, 6, 6, 6, 6, 6, 6 ]
+                            msg=flexmsg.flex(column,data,progress_target)
                             line_bot_api.reply_message(
                                 event.reply_token,
                                 msg
@@ -237,78 +270,13 @@ def echo(event):
                     msg
                 )
 
-            elif "詳細資訊" in event.message.text :
-                record=event.message.text.split("_")
-                DATABASE_URL = os.environ['DATABASE_URL']
-                conn = psycopg2.connect(DATABASE_URL, sslmode='require')
-                cursor = conn.cursor()
-                postgres_select_query = f"""SELECT * FROM group_data WHERE activity_no = '{record[0]}' ;"""
-                cursor.execute(postgres_select_query)
-                data_tmp = cursor.fetchone()
-                msg=flexmsg.MoreInfoSummary(data_tmp)
-
-                line_bot_api.reply_message(
-                    event.reply_token,
-                    msg
-                )
-                
-                #~~點了carousel的"了解更多"，跳出該團的summary
-
-            elif '立即報名' in event.message.text: #點了"立即報名後即回傳activity_no和activity_name"
-                record=event.message.text.split("_")
-                #record[0]:立即報名 record[1]：活動代號 record[2]:活動名稱
-                #刪掉報名失敗的列
-                postgres_delete_query = f"""DELETE FROM registration_data WHERE condition = 'initial' AND user_id = '{event.source.user_id}';"""
-                cursor.execute(postgres_delete_query)
-                conn.commit()
-
-                #創建一列
-                postgres_insert_query = f"""INSERT INTO registration_data (condition, user_id, activity_no, activity_name ) VALUES ('initial', '{event.source.user_id}','{record[1]}', '{record[2]}');"""
-                cursor.execute(postgres_insert_query)   
-                conn.commit()
-                
-                #撈報團者的資料
-                postgres_select_query=f'''SELECT attendee_name, phone FROM registration_data WHERE user_id = '{event.source.user_id}' AND condition != 'initial' ORDER BY record_no DESC;'''
-                cursor.execute(postgres_select_query)
-                data_for_basicinfo = cursor.fetchone()
-                phone= data_for_basicinfo[1]
-                #審核電話
-                postgres_select_query = f"""SELECT phone FROM registration_data WHERE activity_no = '{record[1]}' ;"""
-                cursor.execute(postgres_select_query)
-                phone_registration = cursor.fetchall()
-
-                #如果使用者輸入的電話重複則報名失敗，刪掉原本創建的列
-                if data_for_basicinfo:
-
-                    if (f'{phone}',) in phone_registration:
-                        postgres_select_query = f"""SELECT * FROM registration_data WHERE condition = 'initial' AND user_id = '{event.source.user_id}';"""
-                        cursor.execute(postgres_select_query)
-                        data_2 = cursor.fetchone()
-                        i_2 = data_2.index(None)
-                        msg_2 = flexmsg.extend(i_2,data_2) #flexmsg需要新增報名情境
-                        line_bot_api.reply_message(
-                            event.reply_token,
-                            msg_2
-                        )
-
-                    else:
-                        postgres_update_query = f"""UPDATE registration_data SET attendee_name='{data_for_basicinfo[0]}' , phone='{data_for_basicinfo[1]}' WHERE (condition, user_id) = ('initial', '{event.source.user_id}');"""
-                        cursor.execute(postgres_update_query)
-                        conn.commit()
-                        postgres_select_query = f"""SELECT * FROM registration_data WHERE condition = 'initial' AND user_id = '{event.source.user_id}';"""
-                        cursor.execute(postgres_select_query)
-                        data_2 = cursor.fetchone()
-                        msg_2 = flexmsg.summary_for_attend(data_2)
-                        line_bot_api.reply_message(
-                            event.reply_token,
-                            msg_2
-                        )
+            
 
 
 
             elif data_2:
                 if None in data_2:
-                    
+                   
                     i_2 = data_2.index(None)
 
                     record = event.message.text
@@ -362,7 +330,7 @@ def echo(event):
 
 
                     if None in data_2:
-                        msg_2 = flexmsg.extend(i_2+1,data_2) #flexmsg需要新增報名情境
+                        msg_2 = flexmsg.extend(i_2+1,data_2,progress_list_fullregistrationdata) #flexmsg需要新增報名情境
                         line_bot_api.reply_message(
                             event.reply_token,
                             msg_2
@@ -427,7 +395,7 @@ def echo(event):
                         postgres_update_query = f"""UPDATE registration_data SET {event.message.text} = Null WHERE condition = 'initial' AND user_id = '{event.source.user_id}';"""
                         cursor.execute(postgres_update_query)
                         conn.commit()
-                        msg_2 = flexmsg.extend(event.message.text,data_2) #flexmsg需要新增報名情境
+                        msg_2 = flexmsg.extend(event.message.text,data_2,progress_list_fullregistrationdata) #flexmsg需要新增報名情境
                         line_bot_api.reply_message(
                             event.reply_token,
                             msg_2
@@ -462,6 +430,9 @@ def echo(event):
 #處理postback 事件，例如datetime picker
 @handler.add(PostbackEvent)
 def gathering(event):
+    progress_list_fullgroupdata=[7, 1, 2, 3, 4, 5, 6 ,7 ]
+    progress_list_halfgroupdata=[5, 1, 2, 3, 4, 5]
+    progress_list_fullregistrationdata=[2, 0, 0, 0, 0, 0, 1, 2]
     DATABASE_URL = os.environ['DATABASE_URL']
     conn = psycopg2.connect(DATABASE_URL, sslmode='require')
     cursor = conn.cursor()
@@ -469,8 +440,23 @@ def gathering(event):
     cursor.execute(postgres_select_query)
     data = cursor.fetchone()
     postback_data=event.postback.data
+    try:
+        if len(data[14])>0:
+            progress_target = progress_list_halfgroupdata
+        else :
+            progress_target = progress_list_fullgroupdata
+    except:
+        progress_target = progress_list_fullgroupdata
         #主揪查看自己開的團的資訊 (活動名稱、地點、時間、費用、已報名人數)
     if "我的開團" in postback_data:
+        #把只創建卻沒有寫入資料完成的列刪除
+        postgres_delete_query = f"""DELETE FROM group_data WHERE (condition, user_id) = ('initial', '{event.source.user_id}');"""
+        cursor.execute(postgres_delete_query)
+        conn.commit()
+        postgres_delete_query = f"""DELETE FROM registration_data WHERE (condition, user_id) = ('initial', '{event.source.user_id}');"""
+        cursor.execute(postgres_delete_query)
+        conn.commit()
+        
         postgres_select_query = f"""SELECT * FROM group_data WHERE user_id = '{event.source.user_id}' AND activity_date>= '{dt.date.today()}' ORDER BY activity_date ASC;"""
         cursor.execute(postgres_select_query)
         group_data = cursor.fetchall()
@@ -483,6 +469,14 @@ def gathering(event):
             msg
             )
     elif "我的報名" in postback_data:
+        #把只創建卻沒有寫入資料完成的列刪除
+        postgres_delete_query = f"""DELETE FROM group_data WHERE (condition, user_id) = ('initial', '{event.source.user_id}');"""
+        cursor.execute(postgres_delete_query)
+        conn.commit()
+        postgres_delete_query = f"""DELETE FROM registration_data WHERE (condition, user_id) = ('initial', '{event.source.user_id}');"""
+        cursor.execute(postgres_delete_query)
+        conn.commit()
+        
          #用user_id從database找出有報的團
         postgres_select_query = f"""SELECT * FROM registration_data WHERE user_id = '{event.source.user_id}';"""
         cursor.execute(postgres_select_query)
@@ -616,6 +610,79 @@ def gathering(event):
             event.reply_token,
             TextSendMessage(text="取消成功!")
         )
+    elif "詳細資訊" in postback_data :
+        record=postback_data.split("_")
+        DATABASE_URL = os.environ['DATABASE_URL']
+        conn = psycopg2.connect(DATABASE_URL, sslmode='require')
+        cursor = conn.cursor()
+        postgres_select_query = f"""SELECT * FROM group_data WHERE activity_no = '{record[0]}' ;"""
+        cursor.execute(postgres_select_query)
+        data_tmp = cursor.fetchone()
+        msg=flexmsg.MoreInfoSummary(data_tmp)
+
+        line_bot_api.reply_message(
+            event.reply_token,
+            msg
+        )
+                
+         #~~點了carousel的"了解更多"，跳出該團的summary
+
+    elif '立即報名' in postback_data: #點了"立即報名後即回傳activity_no和activity_name"
+        record=postback_data.split("_")
+        #record[0]:立即報名 record[1]：活動代號 record[2]:活動名稱
+
+        #把只創建卻沒有寫入資料的列刪除
+        postgres_delete_query = f"""DELETE FROM group_data WHERE (condition) = ('initial');"""
+        cursor.execute(postgres_delete_query)
+        conn.commit()
+        postgres_delete_query = f"""DELETE FROM registration_data WHERE condition = 'initial' AND user_id = '{event.source.user_id}';"""
+        cursor.execute(postgres_delete_query)
+        conn.commit()
+
+        #創建一列
+        postgres_insert_query = f"""INSERT INTO registration_data (condition, user_id, activity_no, activity_name ) VALUES ('initial', '{event.source.user_id}','{record[1]}', '{record[2]}');"""
+        cursor.execute(postgres_insert_query)   
+        conn.commit()
+
+        #撈報團者的資料
+        postgres_select_query=f'''SELECT attendee_name, phone FROM registration_data WHERE user_id = '{event.source.user_id}' AND condition != 'initial' ORDER BY record_no DESC;'''
+        cursor.execute(postgres_select_query)
+        data_for_basicinfo = cursor.fetchone()
+        phone= data_for_basicinfo[1]
+        #審核電話
+        postgres_select_query = f"""SELECT phone FROM registration_data WHERE activity_no = '{record[1]}' ;"""
+        cursor.execute(postgres_select_query)
+        phone_registration = cursor.fetchall()
+
+        #如果使用者輸入的電話重複則報名失敗，刪掉原本創建的列
+        if data_for_basicinfo:
+
+            if (f'{phone}',) in phone_registration:
+                postgres_select_query = f"""SELECT * FROM registration_data WHERE condition = 'initial' AND user_id = '{event.source.user_id}';"""
+                cursor.execute(postgres_select_query)
+                data_2 = cursor.fetchone()
+                i_2 = data_2.index(None)
+                print("617 count none in data_2 = ",data_2.count(None))
+                print("618 i_2", i_2)
+                msg_2 = flexmsg.extend(i_2,data_2,progress_list_fullregistrationdata) #flexmsg需要新增報名情境
+                line_bot_api.reply_message(
+                    event.reply_token,
+                    msg_2
+                )
+
+            else:
+                postgres_update_query = f"""UPDATE registration_data SET attendee_name='{data_for_basicinfo[0]}' , phone='{data_for_basicinfo[1]}' WHERE (condition, user_id) = ('initial', '{event.source.user_id}');"""
+                cursor.execute(postgres_update_query)
+                conn.commit()
+                postgres_select_query = f"""SELECT * FROM registration_data WHERE condition = 'initial' AND user_id = '{event.source.user_id}';"""
+                cursor.execute(postgres_select_query)
+                data_2 = cursor.fetchone()
+                msg_2 = flexmsg.summary_for_attend(data_2)
+                line_bot_api.reply_message(
+                    event.reply_token,
+                    msg_2
+                )
+#上一頁下一頁要寫在這個else上面
     else:
 
         i = data.index(None)
@@ -646,7 +713,7 @@ def gathering(event):
         data = cursor.fetchone()
 
         if None in data:
-            msg=flexmsg.flex(i,data)
+            msg=flexmsg.flex(i,data,progress_target)
             line_bot_api.reply_message(
                 event.reply_token,
                 msg)
@@ -665,6 +732,8 @@ def gathering(event):
 # location 事件
 @handler.add(MessageEvent, message=LocationMessage)
 def gathering(event):
+    progress_list_fullgroupdata=[7, 1, 2, 3, 4, 5, 6 ,7 ]
+    progress_list_halfgroupdata=[5, 1, 2, 3, 4, 5]
     DATABASE_URL = os.environ['DATABASE_URL']
     conn = psycopg2.connect(DATABASE_URL, sslmode='require')
     cursor = conn.cursor()
@@ -679,19 +748,27 @@ def gathering(event):
                   'phone', 'mail', 'attendee', 'condition', 'user_id']
 
     record =[ event.message.title, event.message.latitude, event.message.longitude]
+    if record[0]==None:
+        record[0]=event.message.address[:50]
     postgres_update_query = f"""UPDATE group_data SET ({column_all[i]}, {column_all[i+1]}, {column_all[i+2]}) = ('{record[0]}', '{record[1]}', '{record[2]}') WHERE condition = 'initial' AND user_id = '{event.source.user_id}';"""
     cursor.execute(postgres_update_query)
     conn.commit()
     cursor.execute(postgres_select_query)
     data = cursor.fetchone()
-
+    try:
+        if len(data[14])>0:
+            progress_target = progress_list_halfgroupdata
+        else :
+            progress_target = progress_list_fullgroupdata
+    except:
+        progress_target = progress_list_fullgroupdata
     if None in data:
-        msg=flexmsg.flex(i,data)
+        msg=flexmsg.flex(i,data,progress_target)
         line_bot_api.reply_message(
             event.reply_token,
             msg)
     elif None not in data:
-        postgres_select_query = f"""SELECT * FROM group_data WHERE user_id = '{event.source.user_id}' ORDER BY record_no DESC;"""
+        postgres_select_query = f"""SELECT * FROM group_data WHERE user_id = '{event.source.user_id}' ORDER BY activity_no DESC;"""
         cursor.execute(postgres_select_query)
         data = cursor.fetchone()
         msg=flexmsg.summary(data)
@@ -702,5 +779,85 @@ def gathering(event):
     cursor.close()
     conn.close()
     
+@handler.add(MessageEvent, message=ImageMessage)
+def pic(event):
+    DATABASE_URL = os.environ['DATABASE_URL']
+    conn = psycopg2.connect(DATABASE_URL, sslmode='require')
+    cursor = conn.cursor()
+    postgres_select_query = f"""SELECT * FROM group_data WHERE condition = 'initial' AND user_id = '{event.source.user_id}';"""
+    cursor.execute(postgres_select_query)
+    data = cursor.fetchone()
+    if data:
+        i = data.index(None)
+        print("i =",i)
+        if i == 12:
+            column_all = ['acrivity_no', 'activity_type', 'activity_name', 
+                          'activity_date', 'activity_time', 'location_tittle', 'lat', 'long', 'people', 'cost', 
+                          'due_date', 'description', 'photo', 'name', 
+                          'phone', 'mail', 'attendee', 'condition', 'user_id']
+            #把圖片存下來並傳上去
+            ext = 'jpg'
+            message_content = line_bot_api.get_message_content(event.message.id)
+            with tempfile.NamedTemporaryFile(dir=static_tmp_path, prefix=ext + '-', delete=False) as tf:
+                for chunk in message_content.iter_content():
+                    tf.write(chunk)
+                tempfile_path = tf.name
+
+            dist_path = tempfile_path + '.' + ext
+            dist_name = os.path.basename(dist_path)
+            os.rename(tempfile_path, dist_path)
+
+            try:
+                config = configparser.ConfigParser()
+                config.read('config.ini')
+                client = ImgurClient(config.get('imgur', 'client_id'), config.get('imgur', 'client_secret'), config.get('imgur', 'access_token'), config.get('imgur', 'refresh_token'))
+                con = {
+                    'album': config.get('imgur', 'album_id'),
+                    'name': f'{event.source.user_id}_{data[3]}',
+                    'title': f'{event.source.user_id}_{data[3]}',
+                    'description': f'{event.source.user_id}_{data[3]}'
+                }
+                path = os.path.join('static', 'tmp', dist_name)
+                image=client.upload_from_path(path, config=con, anon=False)
+                print("path = ",path)
+                os.remove(path)
+                print("image = ",image)
+                #把圖片網址存進資料庫
+                postgres_update_query = f"""UPDATE group_data SET {column_all[i]} = '{image['link']}' WHERE condition = 'initial' AND user_id = '{event.source.user_id}';"""
+                cursor.execute(postgres_update_query)
+                conn.commit()
+                
+                msg=[TextSendMessage(text='上傳成功'), 
+                     ImageSendMessage(original_content_url=image['link'], preview_image_url=image['link']),
+                     TextSendMessage(text=request.host_url + os.path.join('static', 'tmp', dist_name)+"\n\n"+image['link'])]
+                
+                postgres_select_query = f"""SELECT * FROM group_data WHERE user_id = '{event.source.user_id}' ORDER BY activity_no DESC;"""
+                cursor.execute(postgres_select_query)
+                data = cursor.fetchone()
+                if None not in data:
+                    msg.append(flexmsg.summary(data))
+                    
+                line_bot_api.reply_message(
+                    event.reply_token,
+                    msg
+                )
+            except:
+                line_bot_api.reply_message(
+                    event.reply_token,
+                    TextSendMessage(text='上傳失敗'))
+
+    else:
+        line_bot_api.reply_message(
+            event.reply_token,
+            TextSendMessage(text = "現在不用傳圖片給我")
+        )
+    return 0
+@app.route('/static/<path:path>')
+def send_static_content(path):
+    return send_from_directory('static', path)
+
+    
 if __name__ == "__main__":
     app.run()
+    # create tmp dir for download content
+    #make_static_tmp_dir()
