@@ -75,10 +75,10 @@ def echo(event):
             print("prepare to open the group")
 
             #把只創建卻沒有寫入資料的列刪除
-            postgres_delete_query = f"""DELETE FROM group_data WHERE (condition) = ('initial');"""
+            postgres_delete_query = f"""DELETE FROM group_data WHERE (condition, user_id) = ('initial', '{event.source.user_id}');"""
             cursor.execute(postgres_delete_query)
             conn.commit()
-            postgres_delete_query = f"""DELETE FROM registration_data WHERE (condition) = ('initial');"""
+            postgres_delete_query = f"""DELETE FROM registration_data WHERE (condition, user_id) = ('initial', '{event.source.user_id}');"""
             cursor.execute(postgres_delete_query)
             conn.commit()
             
@@ -632,7 +632,7 @@ def gathering(event):
         #record[0]:立即報名 record[1]：活動代號 record[2]:活動名稱
 
         #把只創建卻沒有寫入資料的列刪除
-        postgres_delete_query = f"""DELETE FROM group_data WHERE (condition) = ('initial');"""
+        postgres_delete_query = f"""DELETE FROM group_data WHERE (condition, user_id) = ('initial', '{event.source.user_id}');"""
         cursor.execute(postgres_delete_query)
         conn.commit()
         postgres_delete_query = f"""DELETE FROM registration_data WHERE condition = 'initial' AND user_id = '{event.source.user_id}';"""
@@ -648,7 +648,8 @@ def gathering(event):
         postgres_select_query=f'''SELECT attendee_name, phone FROM registration_data WHERE user_id = '{event.source.user_id}' AND condition != 'initial' ORDER BY record_no DESC;'''
         cursor.execute(postgres_select_query)
         data_for_basicinfo = cursor.fetchone()
-        phone= data_for_basicinfo[1]
+        print(" 651 data_for_basicinfo = ",data_for_basicinfo)
+        
         #審核電話
         postgres_select_query = f"""SELECT phone FROM registration_data WHERE activity_no = '{record[1]}' ;"""
         cursor.execute(postgres_select_query)
@@ -656,6 +657,7 @@ def gathering(event):
 
         #如果使用者輸入的電話重複則報名失敗，刪掉原本創建的列
         if data_for_basicinfo:
+            phone= data_for_basicinfo[1]
 
             if (f'{phone}',) in phone_registration:
                 postgres_select_query = f"""SELECT * FROM registration_data WHERE condition = 'initial' AND user_id = '{event.source.user_id}';"""
@@ -682,6 +684,18 @@ def gathering(event):
                     event.reply_token,
                     msg_2
                 )
+        else:
+            postgres_select_query = f"""SELECT * FROM registration_data WHERE condition = 'initial' AND user_id = '{event.source.user_id}';"""
+            cursor.execute(postgres_select_query)
+            data_2 = cursor.fetchone()
+            i_2 = data_2.index(None)
+            print("617 count none in data_2 = ",data_2.count(None))
+            print("618 i_2", i_2)
+            msg_2 = flexmsg.extend(i_2,data_2,progress_list_fullregistrationdata) #flexmsg需要新增報名情境
+            line_bot_api.reply_message(
+                event.reply_token,
+                msg_2
+            )
 #上一頁下一頁要寫在這個else上面
     else:
 
