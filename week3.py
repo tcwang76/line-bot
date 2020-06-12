@@ -129,6 +129,13 @@ def echo(event):
                 )
         
         elif event.message.text == "~join":
+            #把只創建卻沒有寫入資料的列刪除
+            postgres_delete_query = f"""DELETE FROM group_data WHERE (condition, user_id) = ('initial', '{event.source.user_id}');"""
+            cursor.execute(postgres_delete_query)
+            conn.commit()
+            postgres_delete_query = f"""DELETE FROM registration_data WHERE condition = 'initial' AND user_id = '{event.source.user_id}';"""
+            cursor.execute(postgres_delete_query)
+            conn.commit()
             msg=flexmsg.activity_type
             line_bot_api.reply_message(
                 event.reply_token,
