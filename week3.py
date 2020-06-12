@@ -361,7 +361,8 @@ def echo(event):
                                 event.reply_token,
                                 TextSendMessage(text="報名失敗")
                             )
-                        attendee += 1 
+                        else:
+                            attendee += 1 
 
                         #將更新的報名人數attendee記錄到報名表單group_data裡
                         postgres_update_query = f"""UPDATE group_data SET attendee = {attendee} WHERE activity_no = {activity_no};"""
