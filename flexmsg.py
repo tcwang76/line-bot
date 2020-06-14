@@ -1731,7 +1731,9 @@ def carousel(data,i=0):
     if i==0:
         ii=0
     else:
-        ii=i-8
+        ii=i-9
+        if ii<0:
+            ii=0
         
 
     if data:
@@ -1776,9 +1778,15 @@ def carousel(data,i=0):
                 ]
             )
             tem.append(te)
+            tee=_
 
             if len(tem)>8:
                 break
+        if tee+1==len(data):
+            nextp=i
+        else:    
+            nextp=tee+1
+            
         index=BubbleContainer(
             size = "kilo",
             direction = "ltr",
@@ -1817,7 +1825,7 @@ def carousel(data,i=0):
                     ButtonComponent(          
                         action = PostbackAction(
                         label = "下一頁",
-                        data =  f"forward_activity_{data[0][1]}_{_+1}"
+                        data =  f"forward_activity_{data[0][1]}_{nextp}"
                         ),
                         height = "sm",
                         margin = "none",
