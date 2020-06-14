@@ -1186,16 +1186,27 @@ def MoreInfoSummary(data):
     return sumer
 
 #我的開團列表
-def GroupLst(data): 
+def GroupLst(data, i):
+    item_num = 9
+    
+    if i + item_num > len(data):
+        forward_i = i
+    else:
+        forward_i = i + item_num
+
+    if i == 0:
+        backward_i = 0
+    else:
+        backward_i = i - item_num
 
     if data:
         
         group_lst = []
 
         #row [activity_no, activity_type, activity_name, activity_date, activity_time, activity_title, ...]
-        for row in data:
+        for row in data[i:]:
             
-            activity =f'''{{
+            activity = f'''{{
               "type": "box",
               "layout": "horizontal",
               "contents": [
@@ -1289,7 +1300,7 @@ def GroupLst(data):
                     ButtonComponent(
                         action = PostbackAction(
                             label =  "上一頁",
-                            data =  "backward"
+                            data =  f"backward_group_{backward_i}"
                         ),
                         height = "sm",
                         style = "primary",
@@ -1303,7 +1314,7 @@ def GroupLst(data):
                     ButtonComponent(          
                         action = PostbackAction(
                         label = "下一頁",
-                        data =  "forward"
+                        data =  f"forward_group_{forward_i}"
                         ),
                         height = "sm",
                         style = "primary",
@@ -1423,10 +1434,22 @@ def MyGroupInfo(data):
     return msg
 
 #我的報名列表
-def registration_list(data):
+def registration_list(data, i):
+    item_num = 9
+    
+    if i + item_num > len(data):
+        forward_i = i
+    else:
+        forward_i = i + item_num
+
+    if i == 0:
+        backward_i = 0
+    else:
+        backward_i = i - item_num
+        
     if data:
-        tem=[]
-        for row in data:
+        tem = []
+        for row in data[i:]:
             te = BoxComponent(
                 layout = "horizontal",
                 contents = [
@@ -1467,7 +1490,7 @@ def registration_list(data):
                 ]
             )
             tem.append(te)
-            if len(tem)>7:
+            if len(tem) == item_num:
                 break
 
         bubble = BubbleContainer(
@@ -1495,7 +1518,7 @@ def registration_list(data):
                     ButtonComponent(
                         action = PostbackAction(
                             label =  "上一頁",
-                            data =  "backward"
+                            data =  f"backward_registration_{backward_i}"
                         ),
                         height = "sm",
                         style = "primary",
@@ -1509,7 +1532,7 @@ def registration_list(data):
                     ButtonComponent(          
                         action = PostbackAction(
                         label = "下一頁",
-                        data =  "forward"
+                        data =  f"forward_registration_{forward_i}"
                         ),
                         height = "sm",
                         style = "primary",
@@ -1695,11 +1718,22 @@ def carousel_registration(data,data2):
 
 
 #尚需加入活動index bubble
-def carousel(data): 
+def carousel(activity_type, data, i): 
+    item_num = 9
+    
+    if i + item_num > len(data):
+        forward_i = i
+    else:
+        forward_i = i + item_num
+
+    if i == 0:
+        backward_i = 0
+    else:
+        backward_i = i - item_num
 
     if data:
         tem=[]
-        for row in data:
+        for row in data[i:]:
             te=BoxComponent(
                 layout = "horizontal",
                 contents = [
@@ -1737,7 +1771,7 @@ def carousel(data):
                 ]
             )
             tem.append(te)
-            if len(tem)>8:
+            if len(tem) == item_num:
                 break
         index=BubbleContainer(
             size = "kilo",
@@ -1764,7 +1798,7 @@ def carousel(data):
                     ButtonComponent(
                         action = PostbackAction(
                             label =  "上一頁",
-                            data =  "backward"
+                            data =  f"backward_activity_{activity_type}_{backward_i}"
                         ),
                         color = "#A7D5E1",
                         gravity = "bottom",
@@ -1776,7 +1810,7 @@ def carousel(data):
                     ButtonComponent(          
                         action = PostbackAction(
                         label = "下一頁",
-                        data =  "forward"
+                        data =  f"forward_activity_{activity_type}_{forward_i}"
                         ),
                         color = "#A7D5E1",
                         gravity = "bottom",
@@ -1787,7 +1821,7 @@ def carousel(data):
             )
         )
         bubbles = [index]
-        for row in data:
+        for row in data[i:]:
             
             if "https://i.imgur.com/" not in row[12]:
                 link="https://scdn.line-apps.com/n/channel_devcenter/img/flexsnapshot/clip/clip11.jpg"
@@ -1876,7 +1910,7 @@ def carousel(data):
                             )
                         )
             bubbles.append(temp)
-            if len(bubbles) > 9:
+            if len(bubbles) > item_num:
                 break
     else:
         bubbles=[BubbleContainer(
