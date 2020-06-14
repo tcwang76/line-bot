@@ -59,6 +59,7 @@ def echo(event):
     progress_list_fullgroupdata=[7, 1, 2, 3, 4, 5, 6 ,7 ]
     progress_list_halfgroupdata=[5, 1, 2, 3, 4, 5]
     progress_list_fullregistrationdata=[2, 0, 0, 0, 0, 0, 1, 2]
+    event.message.text=event.message.text.replace("'","‘")
     #progress_target
     if event.source.user_id != "Udeadbeefdeadbeefdeadbeefdeadbeef":
         #連結到heroku資料庫
@@ -183,6 +184,18 @@ def echo(event):
                             event.reply_token,
                             [TextSendMessage(text="請點選按鈕選擇活動地點，謝謝。"),flexmsg.location(progress_target)]
                         )
+                    if i==12:
+                        postgres_update_query = f"""UPDATE group_data SET {column_all[i]} = '無' WHERE condition = 'initial' AND user_id = '{event.source.user_id}';"""
+                        cursor.execute(postgres_update_query)
+                        conn.commit()
+                        postgres_select_query = f"""SELECT * FROM group_data WHERE user_id = '{event.source.user_id}' ORDER BY activity_no DESC;"""
+                        cursor.execute(postgres_select_query)
+                        data = cursor.fetchone()
+                        msg=flexmsg.summary(data)
+                        line_bot_api.reply_message(
+                            event.reply_token,
+                            [TextSendMessage(text="上傳失敗。"),msg]
+                        )
 
                     else:
                         record = event.message.text
@@ -268,7 +281,7 @@ def echo(event):
                 DATABASE_URL = os.environ['DATABASE_URL']
                 conn = psycopg2.connect(DATABASE_URL, sslmode='require')
                 cursor = conn.cursor()
-                postgres_select_query = f"""SELECT * FROM group_data WHERE activity_date >= '{dt.date.today()}' AND activity_type='{event.message.text}'  and people > attendee and condition = 'pending' ORDER BY activity_date ASC ;"""
+                postgres_select_query = f"""SELECT * FROM group_data WHERE activity_date >= '{dt.date.today()}' AND due_date >= '{dt.date.today()}' AND activity_type='{event.message.text}'  and people > attendee and condition = 'pending' ORDER BY activity_date ASC ;"""
                 cursor.execute(postgres_select_query)
                 data_2 = cursor.fetchall()
                 msg=flexmsg.carousel(data_2)
@@ -486,7 +499,7 @@ def gathering(event):
         conn.commit()
         
          #用user_id從database找出有報的團
-        postgres_select_query = f"""SELECT * FROM registration_data WHERE user_id = '{event.source.user_id}';"""
+        postgres_select_query = f"""SELECT * FROM registration_data WHERE user_id = '{event.source.user_id}'AND activity_date>= '{dt.date.today()}' ORDER BY activity_date ASC;"""
         cursor.execute(postgres_select_query)
 
 
@@ -499,6 +512,7 @@ def gathering(event):
                 if act[1] not in act_no:  #act[1]為activity_no, act[2]為activity_name
                     act_no.append(act[1])
                     look_up_data_registration.append(act)
+                    print(act)
 
         msg = flexmsg.registration_list(look_up_data_registration)
         line_bot_api.reply_message(
@@ -637,7 +651,7 @@ def gathering(event):
 
     elif '立即報名' in postback_data: #點了"立即報名後即回傳activity_no和activity_name"
         record=postback_data.split("_")
-        #record[0]:立即報名 record[1]：活動代號 record[2]:活動名稱
+        #record[0]:立即報名 record[1]：活動代號 record[2]:活動名稱 record[3]: 活動日期
 
         #把只創建卻沒有寫入資料的列刪除
         postgres_delete_query = f"""DELETE FROM group_data WHERE (condition, user_id) = ('initial', '{event.source.user_id}');"""
@@ -648,7 +662,7 @@ def gathering(event):
         conn.commit()
 
         #創建一列
-        postgres_insert_query = f"""INSERT INTO registration_data (condition, user_id, activity_no, activity_name ) VALUES ('initial', '{event.source.user_id}','{record[1]}', '{record[2]}');"""
+        postgres_insert_query = f"""INSERT INTO registration_data (condition, user_id, activity_no, activity_name, activity_date ) VALUES ('initial', '{event.source.user_id}','{record[1]}', '{record[2]}', '{record[3]}');"""
         cursor.execute(postgres_insert_query)   
         conn.commit()
 
@@ -704,6 +718,69 @@ def gathering(event):
                 event.reply_token,
                 msg_2
             )
+
+    elif "forward" in postback_data or "backward" in postback_data:
+        
+        record = postback_data.split("_") #record[0] = forward, reocord[1] = command
+
+        if record[1] == "activity":
+
+            #record[2] = activity_type, record[3] = i
+            i = int(record[3])
+            
+            postgres_select_query = f"""SELECT * FROM group_data WHERE activity_date >= '{dt.date.today()}' AND activity_type = '{record[2]}' and people > attendee and condition = 'pending' ORDER BY activity_date ASC;"""
+            cursor.execute(postgres_select_query)
+            data = cursor.fetchall()
+            
+            msg = flexmsg.carousel(data, i)
+            line_bot_api.reply_message(
+                event.reply_token,
+                msg
+                )
+            
+        elif record[1] == "group":
+            
+            #record[2] = i
+            i = int(record[2])       
+            #用user_id尋找該主揪所有的開團資料
+            postgres_select_query = f"""SELECT * FROM group_data WHERE user_id = '{event.source.user_id}' AND activity_date >= '{dt.date.today()}' ORDER BY activity_date ASC;"""
+            cursor.execute(postgres_select_query)
+            group_data = cursor.fetchall()
+
+            print("group_data = ", group_data)
+
+            #回傳開團列表
+            msg = flexmsg.GroupLst(group_data, i)
+            line_bot_api.reply_message(
+                event.reply_token,
+                msg
+            )
+
+        elif record[1] == "registration":
+
+            #record[2] = i
+            i = int(record[2])
+            
+            #用user_id從database找出有報的團
+            postgres_select_query = f"""SELECT * FROM registration_data WHERE user_id = '{event.source.user_id}' AND activity_date >= '{dt.date.today()}' ORDER BY activity_date ASC;"""
+            cursor.execute(postgres_select_query)
+
+            #避免look_up_data_registration裡的actinity_name重複
+            look_up_data_registration = []
+            act_no = []
+            alldata = cursor.fetchall()
+            if alldata:
+                for act in alldata: 
+                    if act[1] not in act_no:  #act[1]為activity_no, act[2]為activity_name
+                        act_no.append(act[1])
+                        look_up_data_registration.append(act)
+
+            msg = flexmsg.registration_list(look_up_data_registration, i)
+            line_bot_api.reply_message(
+                event.reply_token,
+                msg
+            )
+        
 #上一頁下一頁要寫在這個else上面
     else:
 
@@ -768,8 +845,10 @@ def gathering(event):
                   'activity_date', 'activity_time', 'location_tittle', 'lat', 'long', 'people', 'cost', 
                   'due_date', 'description', 'photo', 'name', 
                   'phone', 'mail', 'attendee', 'condition', 'user_id']
-
-    record =[ event.message.title, event.message.latitude, event.message.longitude]
+    tittle = event.message.title
+    if event.message.title:
+        tittle=event.message.title.replace("'","‘")
+    record =[ tittle, event.message.latitude, event.message.longitude]
     if record[0]==None:
         record[0]=event.message.address[:50]
     postgres_update_query = f"""UPDATE group_data SET ({column_all[i]}, {column_all[i+1]}, {column_all[i+2]}) = ('{record[0]}', '{record[1]}', '{record[2]}') WHERE condition = 'initial' AND user_id = '{event.source.user_id}';"""
@@ -849,9 +928,7 @@ def pic(event):
                 cursor.execute(postgres_update_query)
                 conn.commit()
                 
-                msg=[TextSendMessage(text='上傳成功'), 
-                     ImageSendMessage(original_content_url=image['link'], preview_image_url=image['link']),
-                     TextSendMessage(text=request.host_url + os.path.join('static', 'tmp', dist_name)+"\n\n"+image['link'])]
+                msg=[TextSendMessage(text='上傳成功')]
                 
                 postgres_select_query = f"""SELECT * FROM group_data WHERE user_id = '{event.source.user_id}' ORDER BY activity_no DESC;"""
                 cursor.execute(postgres_select_query)
