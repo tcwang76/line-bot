@@ -271,7 +271,7 @@ def echo(event):
                 postgres_select_query = f"""SELECT * FROM group_data WHERE activity_date >= '{dt.date.today()}' AND activity_type='{event.message.text}'  and people > attendee and condition = 'pending' ORDER BY activity_date ASC ;"""
                 cursor.execute(postgres_select_query)
                 data_2 = cursor.fetchall()
-                msg=flexmsg.carousel(data_2)
+                msg=flexmsg.carousel(event.message.text, data_2, 0)
                 line_bot_api.reply_message(
                     event.reply_token,
                     msg
@@ -471,7 +471,7 @@ def gathering(event):
 
         print("group_data = ", group_data)
 
-        msg = flexmsg.GroupLst(group_data)
+        msg = flexmsg.GroupLst(group_data, 0)
         line_bot_api.reply_message(
             event.reply_token,
             msg
@@ -500,7 +500,7 @@ def gathering(event):
                     act_no.append(act[1])
                     look_up_data_registration.append(act)
 
-        msg = flexmsg.registration_list(look_up_data_registration)
+        msg = flexmsg.registration_list(look_up_data_registration, 0)
         line_bot_api.reply_message(
             event.reply_token,
             msg
@@ -705,6 +705,133 @@ def gathering(event):
                 msg_2
             )
 #上一頁下一頁要寫在這個else上面
+
+    elif "forward" in postback_data:
+        
+        record = postback_data.split("_") #record[0] = forward, reocord[1] = command
+
+        if record[1] == "activity":
+
+            #record[2] = activity_type, record[3] = i
+            i = record[3]
+            
+            postgres_select_query = f"""SELECT * FROM group_data WHERE activity_date >= '{dt.date.today()}' AND activity_type = '{record[2]}' and people > attendee and condition = 'pending' ORDER BY activity_date ASC;"""
+            cursor.execute(postgres_select_query)
+            data = cursor.fetchall()
+            
+            msg = flexmsg.carousel(record[2], data, i)
+            line_bot_api.reply_message(
+                event.reply_token,
+                msg
+                )
+            
+        elif record[1] == "group":
+            
+            #record[2] = i
+            i = record[2]
+            
+            #用user_id尋找該主揪所有的開團資料
+            postgres_select_query = f"""SELECT * FROM group_data WHERE user_id = '{user}' AND activity_date >= '{dt.date.today()}' ORDER BY activity_date ASC;"""
+            cursor.execute(postgres_select_query)
+            group_data = cursor.fetchall()
+
+            print("group_data = ", group_data)
+
+            #回傳開團列表
+            msg = flexmsg.GroupLst(group_data, i)
+            line_bot_api.reply_message(
+                event.reply_token,
+                msg
+            )
+
+        elif record[1] == "registration":
+
+            #record[2] = i
+            i = record[2]
+            
+            #用user_id從database找出有報的團
+            postgres_select_query = f"""SELECT * FROM registration_data WHERE user_id = '{event.source.user_id}';"""
+            cursor.execute(postgres_select_query)
+
+            #避免look_up_data_registration裡的actinity_name重複
+            look_up_data_registration = []
+            act_no = []
+            alldata = cursor.fetchall()
+            if alldata:
+                for act in alldata: 
+                    if act[1] not in act_no:  #act[1]為activity_no, act[2]為activity_name
+                        act_no.append(act[1])
+                        look_up_data_registration.append(act)
+
+            msg = flexmsg.registration_list(look_up_data_registration, i)
+            line_bot_api.reply_message(
+                event.reply_token,
+                msg
+            ) 
+
+    elif "backward" in postback_data:
+        
+        record = postback_data.split("_") #record[0] = forward, reocord[1] = command
+
+        if record[1] == "activity":
+
+            #record[2] = activity_type, record[3] = i
+            i = record[3]
+            
+            postgres_select_query = f"""SELECT * FROM group_data WHERE activity_date >= '{dt.date.today()}' AND activity_type = '{record[2]}' and people > attendee and condition = 'pending' ORDER BY activity_date ASC;"""
+            cursor.execute(postgres_select_query)
+            data = cursor.fetchall()
+            
+            msg = flexmsg.carousel(record[2], data, i)
+            line_bot_api.reply_message(
+                event.reply_token,
+                msg
+                )
+            
+        elif record[1] == "group":
+            
+            #record[2] = i
+            i = record[2]
+            
+            #用user_id尋找該主揪所有的開團資料
+            postgres_select_query = f"""SELECT * FROM group_data WHERE user_id = '{user}' AND activity_date >= '{dt.date.today()}' ORDER BY activity_date ASC;"""
+            cursor.execute(postgres_select_query)
+            group_data = cursor.fetchall()
+
+            print("group_data = ", group_data)
+
+            #回傳開團列表
+            msg = flexmsg.GroupLst(group_data, i)
+            line_bot_api.reply_message(
+                event.reply_token,
+                msg
+            )
+
+        elif record[1] == "registration":
+
+            #record[2] = i
+            i = record[2]
+            
+            #用user_id從database找出有報的團
+            postgres_select_query = f"""SELECT * FROM registration_data WHERE user_id = '{event.source.user_id}';"""
+            cursor.execute(postgres_select_query)
+
+            #避免look_up_data_registration裡的actinity_name重複
+            look_up_data_registration = []
+            act_no = []
+            alldata = cursor.fetchall()
+            if alldata:
+                for act in alldata: 
+                    if act[1] not in act_no:  #act[1]為activity_no, act[2]為activity_name
+                        act_no.append(act[1])
+                        look_up_data_registration.append(act)
+
+            msg = flexmsg.registration_list(look_up_data_registration, i)
+            line_bot_api.reply_message(
+                event.reply_token,
+                msg
+            )
+
     else:
 
         i = data.index(None)
