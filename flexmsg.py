@@ -170,7 +170,8 @@ def activity_time(progress):
                                          DatetimePickerAction(
                                              label = "點我選時間",
                                              data = "Activity_time",
-                                             mode = "datetime"
+                                             mode = "datetime",
+                                             min = f"{'T'.join(str(dt.datetime.today()+dt.timedelta(hours=8))[:16].split())}"
                                          ),
                                          height = "sm",
                                          margin = "none",
@@ -501,7 +502,7 @@ mail = FlexSendMessage(
 def summary(data):
     if data[12]=='無':
         act=None
-        col="#141414"
+        col="#444444"
     else:
         act=URIAction(uri = f"{data[12]}")
         col="#229C8F"
@@ -513,7 +514,7 @@ def summary(data):
               layout = "vertical",
               contents = [
               TextComponent(
-                  text = "請確認開團資訊：",
+                  text = "請確認開團資訊",
                   weight = "bold",
                   size = "md",
                   align = "start",
@@ -528,13 +529,13 @@ def summary(data):
                         layout = "horizontal",
                         contents = [
                             TextComponent(
-                                text = f"活動類型：{data[1]}",
+                                text = f"活動類型 {data[1]}",
                                 size = "md",
                                 flex = 10,
                                 align = "start"
                             ),
                             SeparatorComponent(
-                                margin = "lg"
+                                color = "#FFFFFF",margin = "lg"
                             )
                         ]
                     ),
@@ -557,13 +558,13 @@ def summary(data):
                         layout = "horizontal",
                         contents = [
                             TextComponent(
-                                text = f"活動名稱：{data[2]}",
+                                text = f"活動名稱 {data[2]}",
                                 size = "md",
                                 flex = 10,
                                 align = "start"
                             ),
                             SeparatorComponent(
-                                margin = "lg"
+                                color = "#FFFFFF",margin = "lg"
                             )
                         ]
                     ),
@@ -586,13 +587,13 @@ def summary(data):
                         layout = "horizontal",
                         contents = [
                             TextComponent(
-                                text = f"活動時間：{data[3]} {str(data[4])[:5]}",
+                                text = f"活動時間 {data[3]} {str(data[4])[:5]}",
                                 size = "md",
                                 flex = 10,
                                 align = "start"
                             ),
                             SeparatorComponent(
-                                margin = "lg"
+                                color = "#FFFFFF",margin = "lg"
                             )
                         ]
                     ),BoxComponent(
@@ -614,14 +615,14 @@ def summary(data):
                         layout = "horizontal",
                         contents = [
                             TextComponent(
-                                text = f"活動地點：{data[5]}",
+                                text = f"活動地點 {data[5]}",
                                 size = "md",
                                 flex = 10,
                                 wrap = True,
                                 align = "start"
                             ),
                             SeparatorComponent(
-                                margin = "lg"
+                                color = "#FFFFFF",margin = "lg"
                             )
                         ]
                     ),
@@ -644,13 +645,13 @@ def summary(data):
                         layout = "horizontal",
                         contents = [
                             TextComponent(
-                                text = f"活動人數：{data[8]}",
+                                text = f"活動人數 {data[8]}",
                                 size = "md",
                                 flex = 10,
                                 align = "start"
                             ),
                             SeparatorComponent(
-                                margin = "lg"
+                                color = "#FFFFFF",margin = "lg"
                             )
                         ]
                     ),
@@ -673,13 +674,13 @@ def summary(data):
                         layout = "horizontal",
                         contents = [
                             TextComponent(
-                                text = f"活動費用：{data[9]}",
+                                text = f"活動費用 {data[9]}",
                                 size = "md",
                                 flex = 10,
                                 align = "start"
                             ),
                             SeparatorComponent(
-                                margin = "lg"
+                                color = "#FFFFFF",margin = "lg"
                             )
                         ]
                     ),
@@ -702,13 +703,13 @@ def summary(data):
                         layout = "horizontal",
                         contents = [
                             TextComponent(
-                                text = f"報名截止日：{data[10]}",
+                                text = f"報名截止日 {data[10]}",
                                 size = "md",
                                 flex = 10,
                                 align = "start"
                             ),
                             SeparatorComponent(
-                                margin = "lg"
+                                color = "#FFFFFF",margin = "lg"
                             )
                         ]
                     ),
@@ -731,13 +732,13 @@ def summary(data):
                         layout = "horizontal",
                         contents = [
                             TextComponent(
-                                text = f"活動敘述：{data[11]}",
+                                text = f"活動敘述 {data[11]}",
                                 size = "md",
                                 flex = 10,
                                 align = "start"
                             ),
                             SeparatorComponent(
-                                margin = "lg"
+                                color = "#FFFFFF",margin = "lg"
                             )
                         ]
                     ),
@@ -760,7 +761,7 @@ def summary(data):
                         layout = "horizontal",
                         contents = [
                             TextComponent(
-                                text = f"活動照片：{data[12]}",
+                                text = f"活動照片 {data[12]}",
                                 size = "md",
                                 flex = 10,
                                 align = "start",
@@ -769,7 +770,7 @@ def summary(data):
                                 color = f"{col}"
                             ),
                             SeparatorComponent(
-                                margin = "lg"
+                                color = "#FFFFFF",margin = "lg"
                             )
                         ]
                     ),
@@ -792,13 +793,13 @@ def summary(data):
                         layout = "horizontal",
                         contents = [
                             TextComponent(
-                                text = f"主揪姓名：{data[13]}",
+                                text = f"主揪姓名 {data[13]}",
                                 size = "md",
                                 flex = 10,
                                 align = "start"
                             ),
                             SeparatorComponent(
-                                margin = "lg"
+                                color = "#FFFFFF",margin = "lg"
                             )
                         ]
                     ), 
@@ -821,13 +822,13 @@ def summary(data):
                         layout = "horizontal",
                         contents = [
                             TextComponent(
-                                text = f"主揪電話：{data[14]}",
+                                text = f"主揪電話 {data[14]}",
                                 size = "md",
                                 flex = 10,
                                 align = "start"
                             ),
                             SeparatorComponent(
-                                margin = "lg"
+                                color = "#FFFFFF",margin = "lg"
                             )
                         ]
                     ),
@@ -886,31 +887,36 @@ def summary_for_attend(data):
         alt_text = "請確認報名資訊",
         contents = BubbleContainer(
             direction = "ltr",
-            header = BoxComponent(
-              layout = "vertical",
-              contents = [
-              TextComponent(
-                  text = "請確認報名資訊：",
-                  weight = "bold",
-                  size = "lg",
-                  align = "start",
-                  color = "#000000"
-                  )
-              ]
-            ),
             body = BoxComponent(
                 layout = "vertical",
                 contents = [
                     BoxComponent(
-                        layout = "horizontal",
+                        layout = "vertical",
                         contents = [
                             TextComponent(
-                                text = f"活動序號：{data[1]}",
-                                size = "md",
+                                text = "請確認報名資訊",
+                                weight = "bold",
+                                size = "xl",
+                                align = "start",
+                                color = "#000000"
+                            ),
+                            SeparatorComponent(
+                                color = "#FFFFFF",
+                                margin = "lg"
+                            )
+                        ]
+                    ),
+                    BoxComponent(
+                        layout = "vertical",
+                        contents = [
+                            TextComponent(
+                                text = f"活動名稱 {data[2]}",
+                                size = "lg",
                                 flex = 10,
                                 align = "start"
                             ),
                             SeparatorComponent(
+                                color = "#FFFFFF",
                                 margin = "lg"
                             )
                         ]
@@ -919,26 +925,13 @@ def summary_for_attend(data):
                         layout = "horizontal",
                         contents = [
                             TextComponent(
-                                text = f"活動名稱：{data[2]}",
+                                text = f"姓名 {data[3]}",
                                 size = "md",
                                 flex = 10,
                                 align = "start"
                             ),
                             SeparatorComponent(
-                                margin = "lg"
-                            )
-                        ]
-                    ),
-                    BoxComponent(
-                        layout = "horizontal",
-                        contents = [
-                            TextComponent(
-                                text = f"姓名：{data[3]}",
-                                size = "md",
-                                flex = 10,
-                                align = "start"
-                            ),
-                            SeparatorComponent(
+                                color = "#FFFFFF",
                                 margin = "lg"
                             )
                         ]
@@ -962,12 +955,13 @@ def summary_for_attend(data):
                         layout = "horizontal",
                         contents = [
                             TextComponent(
-                                text = f"電話：{data[4]}",
+                                text = f"電話 {data[4]}",
                                 size = "md",
                                 flex = 10,
                                 align = "start"
                             ),
                             SeparatorComponent(
+                                color = "#FFFFFF",
                                 margin = "lg"
                             )
                         ]
@@ -1026,19 +1020,28 @@ def summary_for_attend(data):
 def MoreInfoSummary(data):
     if "https://i.imgur.com/" not in data[12]:
         act=None
-        col="#141414"
+        col="#444444"
+        hero= None
     else:
         act=URIAction(uri = f"{data[12]}")
         col="#229C8F"
+        hero=ImageComponent(
+            size = "full",
+            aspectMode = "cover",
+            margin ="none",
+            url = f"{data[12]}"
+            )
+        
     sumer = FlexSendMessage(
         alt_text = "詳細活動資訊",
         contents = BubbleContainer(
             direction = "ltr",
+            margin= "none",
             header = BoxComponent(
                 layout = "vertical",
                 contents = [
                     TextComponent(
-                        text = f"{data[2]}\n活動資訊如下：",
+                        text = f"{data[2]}\n活動資訊如下",
                         weight = "bold",
                         size = "lg",
                         align = "start",
@@ -1046,6 +1049,7 @@ def MoreInfoSummary(data):
                     )
                 ]
             ),
+            hero=hero,
             body = BoxComponent(
                   layout = "vertical",
                   contents = [
@@ -1053,7 +1057,7 @@ def MoreInfoSummary(data):
                           layout = "horizontal",
                           contents = [
                               TextComponent(
-                                  text = f"活動類型：{data[1]}",
+                                  text = f"活動類型 {data[1]}",
                                   size = "md",
                                   flex = 10,
                                   align = "start",
@@ -1064,7 +1068,7 @@ def MoreInfoSummary(data):
                           layout = "horizontal",
                           contents = [
                               TextComponent(
-                                  text = f"活動名稱：{data[2]}",
+                                  text = f"活動名稱 {data[2]}",
                                   size = "md",
                                   flex = 10,
                                   align = "start"
@@ -1075,7 +1079,7 @@ def MoreInfoSummary(data):
                           layout = "horizontal",
                           contents = [
                               TextComponent(
-                                  text = f"活動時間：{data[3]} {str(data[4])[:5]}",
+                                  text = f"活動時間 {data[3]} {str(data[4])[:5]}",
                                   size = "md",
                                   flex = 10,
                                   align = "start"
@@ -1086,7 +1090,7 @@ def MoreInfoSummary(data):
                           layout = "horizontal",
                           contents = [
                               TextComponent(
-                                  text = f"活動地點：{data[5]}",
+                                  text = f"活動地點 {data[5]}",
                                   size = "md",
                                   flex = 10,
                                   wrap = True,
@@ -1098,7 +1102,7 @@ def MoreInfoSummary(data):
                           layout = "horizontal",
                           contents = [
                               TextComponent(
-                                  text = f"活動人數：{data[8]}",
+                                  text = f"活動人數 {data[8]}",
                                   size = "md",
                                   flex = 10,
                                   align = "start"
@@ -1109,7 +1113,7 @@ def MoreInfoSummary(data):
                           layout = "horizontal",
                           contents = [
                               TextComponent(
-                                  text = f"活動費用：{data[9]}",
+                                  text = f"活動費用 {data[9]}",
                                   size = "md",
                                   flex = 10,
                                   align = "start"
@@ -1120,7 +1124,7 @@ def MoreInfoSummary(data):
                           layout = "horizontal",
                           contents = [
                               TextComponent(
-                                  text = f"報名截止日：{data[10]}",
+                                  text = f"報名截止日 {data[10]}",
                                   size = "md",
                                   flex = 10,
                                   align = "start"
@@ -1131,7 +1135,7 @@ def MoreInfoSummary(data):
                           layout = "horizontal",
                           contents = [
                               TextComponent(
-                                  text = f"活動敘述：{data[11]}",
+                                  text = f"活動敘述 {data[11]}",
                                   size = "md",
                                   flex = 10,
                                   align = "start"
@@ -1142,7 +1146,7 @@ def MoreInfoSummary(data):
                           layout = "horizontal",
                           contents = [
                               TextComponent(
-                                  text = f"活動照片：{data[12]}",
+                                  text = f"活動照片 {data[12]}",
                                   size = "md",
                                   flex = 10,
                                   align = "start",
@@ -1155,7 +1159,7 @@ def MoreInfoSummary(data):
                           layout = "horizontal",
                           contents = [
                               TextComponent(
-                                  text = f"主揪姓名：{data[13]}",
+                                  text = f"主揪姓名 {data[13]}",
                                   size = "md",
                                   flex = 10,
                                   align = "start"
@@ -1175,7 +1179,7 @@ def MoreInfoSummary(data):
                           gravity = "bottom",
                           action = PostbackAction(
                               label = "立即報名",
-                              data = f"立即報名_{data[0]}_{data[2]}",
+                              data = f"立即報名_{data[0]}_{data[2]}_{data[3]}",
                               display_text = f"我要報名 {data[2]}"
                           )
                       )
@@ -1186,15 +1190,19 @@ def MoreInfoSummary(data):
     return sumer
 
 #我的開團列表
-def GroupLst(data): 
+def GroupLst(data,_ = 0): 
+    if _==0:
+        ii=0
+    else:
+        ii=_-8
 
     if data:
         
         group_lst = []
 
         #row [activity_no, activity_type, activity_name, activity_date, activity_time, activity_title, ...]
-        for row in data:
-            
+        for i in range(_,len(data)):
+            print("i = ",i)
             activity =f'''{{
               "type": "box",
               "layout": "horizontal",
@@ -1214,7 +1222,7 @@ def GroupLst(data):
                 }},
                 {{
                   "type": "text",
-                  "text": "{row[2]}",
+                  "text": "{data[i][2]}",
                   "flex": 9,
                   "size": "md",
                   "align" :  "start",
@@ -1223,7 +1231,7 @@ def GroupLst(data):
                   "margin": "sm",
                   "action": {{
                   "type": "postback",
-                  "data": "開團資訊 {row[0]}"
+                  "data": "開團資訊 {data[i][0]}"
                   }}
                     
                 }}
@@ -1289,7 +1297,7 @@ def GroupLst(data):
                     ButtonComponent(
                         action = PostbackAction(
                             label =  "上一頁",
-                            data =  "backward"
+                            data =  f"backward_group_{ii}"
                         ),
                         height = "sm",
                         style = "primary",
@@ -1303,7 +1311,7 @@ def GroupLst(data):
                     ButtonComponent(          
                         action = PostbackAction(
                         label = "下一頁",
-                        data =  "forward"
+                        data =  f"forward_group_{i+1}"
                         ),
                         height = "sm",
                         style = "primary",
@@ -1322,99 +1330,117 @@ def GroupLst(data):
 
 #開團資訊
 def MyGroupInfo(data):
-    if "https://i.imgur.com/" not in data[12]:
-        link="https://scdn.line-apps.com/n/channel_devcenter/img/flexsnapshot/clip/clip11.jpg"
-    else:
-        link=f"{data[12]}"
-    bubble = BubbleContainer(
-        size = "kilo",
-        direction = "ltr", 
-        hero = ImageComponent(
-            size = "full",
-            aspectMode = "cover",
-            aspectRatio = "320:213",
-            url = f"{link}"
-            ),
-        body = BoxComponent(
-            layout = "vertical",
-            contents = [
-                TextComponent(
-                    text = f"{data[2]}",
-                    weight = "bold",
-                    size = "md",
-                    wrap = True
-                    ),
-                BoxComponent(
-                    layout = "vertical",
-                    contents = [
-                        BoxComponent(
-                            layout = "vertical",
-                            spacing = "sm",
-                            contents = [
-                                TextComponent(
-                                    text = f"地點 {data[5]}",
-                                    wrap = True,
-                                    size = "sm",
-                                    flex = 5,
-                                    ),
-                                TextComponent(
-                                    text = f"時間 {data[3]} {str(data[4])[:5]}",
-                                    size = "sm",
-                                    ),
-                                TextComponent(
-                                    text = f"費用 {data[9]}",
-                                    size = "sm",
-                                    ),
-                                TextComponent(
-                                    text = f"已報名人數 {data[15]}/{data[8]}",
-                                    size = "sm",
-                                    ),
-                                TextComponent(
-                                    text = f"狀態 {data[16]}",
-                                    size = "sm",
-                                    )
-                                ]
-                            )
-                        ]
+    if data:
+        if "https://i.imgur.com/" not in data[12]:
+            link="https://scdn.line-apps.com/n/channel_devcenter/img/flexsnapshot/clip/clip11.jpg"
+        else:
+            link=f"{data[12]}"
+        bubble = BubbleContainer(
+            size = "kilo",
+            direction = "ltr", 
+            hero = ImageComponent(
+                size = "full",
+                aspectMode = "cover",
+                aspectRatio = "320:213",
+                url = f"{link}"
+                ),
+            body = BoxComponent(
+                layout = "vertical",
+                contents = [
+                    TextComponent(
+                        text = f"{data[2]}",
+                        weight = "bold",
+                        size = "md",
+                        wrap = True
+                        ),
+                    BoxComponent(
+                        layout = "vertical",
+                        contents = [
+                            BoxComponent(
+                                layout = "vertical",
+                                spacing = "sm",
+                                contents = [
+                                    TextComponent(
+                                        text = f"地點 {data[5]}",
+                                        wrap = True,
+                                        size = "sm",
+                                        flex = 5,
+                                        ),
+                                    TextComponent(
+                                        text = f"時間 {data[3]} {str(data[4])[:5]}",
+                                        size = "sm",
+                                        ),
+                                    TextComponent(
+                                        text = f"費用 {data[9]}",
+                                        size = "sm",
+                                        ),
+                                    TextComponent(
+                                        text = f"已報名人數 {data[15]}/{data[8]}",
+                                        size = "sm",
+                                        ),
+                                    TextComponent(
+                                        text = f"狀態 {data[16]}",
+                                        size = "sm",
+                                        )
+                                    ]
+                                )
+                            ]
+                        )
+                    ],
+                paddingAll = "13px",
+                spacing = "md",
+                ),
+            footer = BoxComponent(
+                layout = "horizontal",
+                contents = [
+                    ButtonComponent(
+                        style = "primary",
+                        action = PostbackAction(
+                            label = "報名者資訊",
+                            data = f"報名者資訊 {data[0]}",  #activity_no
+                            display_text = "查看報名者資訊"
+                            ),
+                        height = "sm",
+                        margin = "none",
+                        gravity = "bottom",
+                        color = "#A7D5E1"
+                        ),
+                    SeparatorComponent(
+                        margin = "sm",
+                        color = "#FFFFFF"
+                        ),
+                    ButtonComponent(
+                        style = "primary",
+                        action = PostbackAction(
+                            label = "結束報名",
+                            data = f"結束報名 {data[0]}",  #activity_no
+                            display_text = "結束報名"
+                            ),
+                        height = "sm",
+                        margin = "none",
+                        gravity = "bottom",
+                        color = "#A7D5E1"
+                        )
+                    ]
                     )
-                ],
-            paddingAll = "13px",
-            spacing = "md",
-            ),
-        footer = BoxComponent(
-            layout = "horizontal",
-            contents = [
-                ButtonComponent(
-                    style = "primary",
-                    action = PostbackAction(
-                        label = "報名者資訊",
-                        data = f"報名者資訊 {data[0]}",  #activity_no
-                        display_text = "查看報名者資訊"
-                        ),
-                    height = "sm",
-                    margin = "none",
-                    gravity = "bottom",
-                    color = "#A7D5E1"
-                    ),
-                SeparatorComponent(
-                    margin = "sm",
-                    color = "#FFFFFF"
-                    ),
-                ButtonComponent(
-                    style = "primary",
-                    action = PostbackAction(
-                        label = "結束報名",
-                        data = f"結束報名 {data[0]}",  #activity_no
-                        display_text = "結束報名"
-                        ),
-                    height = "sm",
-                    margin = "none",
-                    gravity = "bottom",
-                    color = "#A7D5E1"
+                )
+    else:
+        bubble = BubbleContainer(
+            direction = "ltr", 
+            body = BoxComponent(
+                size="xs",
+                layout = "vertical",
+                spacing =  "md",
+                contents = [
+                    TextComponent(
+                        text =  "目前無開團資料",
+                        size =  "lg",
+                        weight =  "bold",
+                        color =  "#AAAAAA"
                     )
                 ]
-                )
             )
+        )
     
     msg = FlexSendMessage(
         alt_text = "我的開團資訊",
@@ -1423,10 +1449,16 @@ def MyGroupInfo(data):
     return msg
 
 #我的報名列表
-def registration_list(data):
+def registration_list(data,i=0):
+    if i==0:
+        ii=0
+    else:
+        ii=i-8
+        
     if data:
         tem=[]
-        for row in data:
+        for _ in range(i, len(data)):
+            print(data[_])
             te = BoxComponent(
                 layout = "horizontal",
                 contents = [
@@ -1451,15 +1483,15 @@ def registration_list(data):
                         flex =  9,
                         contents = [ 
                             TextComponent(
-                                text =  f"{row[2]}",
+                                text =  f"{data[_][2]}",
                                 align =  "start",
                                 size = "md",
                                 color = "#227C9D",
                                 weight =  "regular",
                                 margin= "sm",
                                 action = PostbackAction(
-                                    label = f"{row[2]}查報名",
-                                    data = f"{row[1]}_查報名"
+                                    label = f"{data[_][2]}查報名",
+                                    data = f"{data[_][1]}_查報名"
                                 )    
                             )
                         ]
@@ -1474,12 +1506,18 @@ def registration_list(data):
             size = "kilo",
             direction = "ltr",
             header = BoxComponent(
-            layout = "horizontal",
+            layout = "vertical",
             contents = [ 
                 TextComponent(
                     text =  "我的報名列表",
                     size =  "lg",
                     weight =  "bold",
+                    color =  "#AAAAAA"
+                ),
+                TextComponent(
+                    text =  "（依照活動日期排列）",
+                    size =  "md",
+                    weight =  "regular",
                     color =  "#AAAAAA"
                 )
             ]
@@ -1495,7 +1533,7 @@ def registration_list(data):
                     ButtonComponent(
                         action = PostbackAction(
                             label =  "上一頁",
-                            data =  "backward"
+                            data =  f"backward_registration_{ii}"
                         ),
                         height = "sm",
                         style = "primary",
@@ -1509,7 +1547,7 @@ def registration_list(data):
                     ButtonComponent(          
                         action = PostbackAction(
                         label = "下一頁",
-                        data =  "forward"
+                        data =  f"forward_registration_{_+1}"
                         ),
                         height = "sm",
                         style = "primary",
@@ -1624,7 +1662,7 @@ def carousel_registration(data,data2):
                 layout = "vertical",
                 contents = [
                     TextComponent(
-                        text = "報名資訊：",
+                        text = "報名資訊",
                         weight = "bold",
                         size = "md",
                         align = "start",
@@ -1643,21 +1681,15 @@ def carousel_registration(data,data2):
                                 spacing = "sm",
                                 contents = [
                                     TextComponent(
-                                        text = f"活動序號：{row[1]}",
-                                        wrap = True,
-                                        size = "sm",
-                                        flex = 5
-                                    ),
-                                    TextComponent(
-                                        text = f"活動名稱：{row[2]}",
+                                        text = f"活動名稱 {row[2]}",
                                         size = "sm"
                                     ),
                                     TextComponent(
-                                        text = f"姓名：{row[3]}",
+                                        text = f"姓名 {row[3]}",
                                         size = "sm"
                                     ),
                                     TextComponent(
-                                        text = f"電話：{row[4]}",
+                                        text = f"電話 {row[4]}",
                                         size = "sm"
                                     )
                                 ]
@@ -1695,11 +1727,17 @@ def carousel_registration(data,data2):
 
 
 #尚需加入活動index bubble
-def carousel(data): 
+def carousel(data,i=0): 
+    if i==0:
+        ii=0
+    else:
+        ii=i-8
+        
 
     if data:
         tem=[]
-        for row in data:
+        for _ in range(i,len(data)):
+            print("_",_)
             te=BoxComponent(
                 layout = "horizontal",
                 contents = [
@@ -1724,12 +1762,13 @@ def carousel(data):
                         flex =  9,
                         contents = [ 
                             TextComponent(
-                                text =  f"{row[2]}",
+                                text =  f"{data[_][2]}",
                                 align =  "start",
-                                weight =  "bold",
+                                weight =  "regular",
+                                color = "#227C9D",
                                 action = PostbackAction(
                                         displat_text = "詳細資訊",
-                                        data = f"{row[0]}_詳細資訊"
+                                        data = f"{data[_][0]}_詳細資訊"
                                         )
                             )
                         ]
@@ -1737,6 +1776,7 @@ def carousel(data):
                 ]
             )
             tem.append(te)
+
             if len(tem)>8:
                 break
         index=BubbleContainer(
@@ -1764,11 +1804,12 @@ def carousel(data):
                     ButtonComponent(
                         action = PostbackAction(
                             label =  "上一頁",
-                            data =  "backward"
+                            data =  f"backward_activity_{data[0][1]}_{ii}"
                         ),
-                        color = "#A7D5E1",
-                        gravity = "bottom",
                         height = "sm",
+                        margin = "none",
+                        color = "#229C8F",
+                        gravity = "bottom",
                         style = "link"
                     ),
                     SeparatorComponent(
@@ -1776,24 +1817,25 @@ def carousel(data):
                     ButtonComponent(          
                         action = PostbackAction(
                         label = "下一頁",
-                        data =  "forward"
+                        data =  f"forward_activity_{data[0][1]}_{_+1}"
                         ),
-                        color = "#A7D5E1",
-                        gravity = "bottom",
                         height = "sm",
+                        margin = "none",
+                        color = "#229C8F",
+                        gravity = "bottom",
                         style = "link"
                     )
                 ]
             )
         )
         bubbles = [index]
-        for row in data:
+        for _ in range(i,len(data)):
             
-            if "https://i.imgur.com/" not in row[12]:
+            if "https://i.imgur.com/" not in data[_][12]:
                 link="https://scdn.line-apps.com/n/channel_devcenter/img/flexsnapshot/clip/clip11.jpg"
             else:
-                link=f"{row[12]}"
-            print("row[12] = ",row[12],"link = ",link)
+                link=f"{data[_][12]}"
+            print(f"data[{_}][12] = ",data[_][12],"link = ",link)
             temp = BubbleContainer(
                         size = "kilo",
                         direction = "ltr", 
@@ -1807,7 +1849,7 @@ def carousel(data):
                             layout = "vertical",
                             contents = [
                                 TextComponent(
-                                    text = f"{row[2]}",
+                                    text = f"{data[_][2]}",
                                     weight = "bold",
                                     size = "md",
                                     wrap = True
@@ -1820,19 +1862,19 @@ def carousel(data):
                                             spacing = "sm",
                                             contents = [
                                                 TextComponent(
-                                                    text = f"地點: {row[5]}",
+                                                    text = f"地點 {data[_][5]}",
                                                     wrap = True,
                                                     color = "#8c8c8c",
                                                     size = "xs",
                                                     flex = 5,
                                                     ),
                                                 TextComponent(
-                                                    text = f"時間: {row[3]} {str(row[4])[:5]}",
+                                                    text = f"時間 {data[_][3]} {str(data[_][4])[:5]}",
                                                     color = "#8c8c8c",
                                                     size = "xs",
                                                     ),
                                                 TextComponent(
-                                                    text = f"費用: {row[9]}",
+                                                    text = f"費用 {data[_][9]}",
                                                     color = "#8c8c8c",
                                                     size = "xs",
                                                     ),
@@ -1851,8 +1893,8 @@ def carousel(data):
                                     style = "link",
                                     action = PostbackAction(
                                         label = "立即報名",
-                                        data = f"立即報名_{row[0]}_{row[2]}",
-                                        display_text=f"我要報名{row[2]}"
+                                        data = f"立即報名_{data[_][0]}_{data[_][2]}_{data[_][3]}",
+                                        display_text=f"我要報名{data[_][2]}"
                                     ),
                                     height = "sm",
                                     margin = "none",
@@ -1864,8 +1906,8 @@ def carousel(data):
                                     style = "link",
                                     action = PostbackAction(
                                         label = "詳細資訊",
-                                        data = f"{row[0]}_詳細資訊",
-                                        display_text = f"{row[0]}詳細資訊"
+                                        data = f"{data[_][0]}_詳細資訊",
+                                        display_text = f"請告訴我這個活動詳細資訊"
                                         ),
                                     height = "sm",
                                     margin = "none",
@@ -1903,6 +1945,10 @@ def carousel(data):
             )
         )
     return msg_carousel
+
+#下一頁、上一頁的index carousel
+
+
 
 # #請把Flexmessage集中在這邊
 
