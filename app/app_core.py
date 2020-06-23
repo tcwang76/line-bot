@@ -184,7 +184,7 @@ def echo(event):
                             event.reply_token,
                             [TextSendMessage(text = "請點選按鈕選擇活動地點，謝謝。"),flexmsg.location(progress_target)]
                         )
-                    if i==12:
+                    elif i==12:
                         postgres_update_query = f"""UPDATE group_data SET {column_all[i]} = '無' WHERE condition = 'initial' AND user_id = '{event.source.user_id}';"""
                         cursor.execute(postgres_update_query)
                         conn.commit()
